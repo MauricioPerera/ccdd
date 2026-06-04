@@ -1,0 +1,5 @@
+{
+  "diff_under_review": "--- a/src/auth.ts\n+++ b/src/auth.ts\n@@ -10,7 +10,9 @@\n function login(user, pass) {\n-  const ok = db.check(user, pass);\n+  const q = `SELECT * FROM users WHERE name='${user}' AND pass='${pass}'`;\n+  const ok = db.raw(q);\n   if (ok) return issueToken(user);\n   return null;\n }",
+  "repo_map": "src/auth.ts (login, issueToken), src/db.ts (check, raw), src/token.ts (issueToken, verify). Tests en test/auth.test.ts.",
+  "lint_results": "src/auth.ts:12 warning: avoid template literals in SQL. src/auth.ts:13 info: db.raw bypasses parametrization."
+}

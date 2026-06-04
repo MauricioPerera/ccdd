@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.key
+ccdd_reference/contracts/*/last-assembly.json
+ccdd_reference/contracts/*/diff-report.json

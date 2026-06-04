@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+# Claves privadas de revisores: NUNCA se versionan (reviewers.json sí, son públicas)
+*.key
+# Artefactos generados por las corridas (regenerables):
+contracts/*/last-assembly.json
+contracts/*/diff-report.json

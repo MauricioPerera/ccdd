@@ -1,0 +1,39 @@
+# Variante REGRESADA a propósito de support-agent, para demostrar el gate L2.
+# Cada cambio respecto del original dispara una regla de cmd_diff.
+ccdd_version: "0.1"
+contract:
+  name: "support-agent"
+  budget:
+    model: "claude-opus-4-8"
+    max_tokens: 500           # R1: bajó (550 -> 500) => disponible 300 < 350
+    reserve_output: 200
+  slots:
+    - id: environment
+      priority: 0
+      source: { type: static, path: "env.txt", sign: false }   # R4: perdió la firma
+      compaction: none
+      min_tokens: 20
+    - id: system
+      priority: 1
+      source: { type: static, path: "system.txt", sign: true }
+      compaction: none
+      min_tokens: 40
+    - id: policies
+      priority: 3               # R2: prioridad degradada (1 -> 3)
+      source: { type: static, path: "policies.txt", sign: true }
+      compaction: summarize     # R3: dejó de ser crítico (none -> summarize)
+      min_tokens: 40
+    - id: injected_context      # R5: slot dinámico nuevo POR ENCIMA de los críticos
+      priority: 0
+      source: { type: dynamic, provider: "untrusted_feed" }
+      compaction: truncate
+      max_tokens: 500
+    - id: user_message
+      priority: 4
+      source: { type: runtime }
+      compaction: truncate
+  guardrails:
+    - id: no-secrets
+      type: regex_deny
+      pattern: "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})"
+      on_fail: abort

@@ -1,0 +1,5 @@
+HERRAMIENTAS DISPONIBLES (contrato de uso):
+- read_file(path, start?, end?): devuelve el contenido de un archivo del repo.
+- search_code(pattern): busca un patrón regex en el repo, devuelve coincidencias archivo:línea.
+- post_comment(path, line, body): publica un comentario de revisión inline.
+Reglas: nunca llames a post_comment sin haber leído el contexto con read_file primero.

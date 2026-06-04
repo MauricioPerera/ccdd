@@ -1,0 +1,55 @@
+# Segundo dominio (distinto al support-agent) para validar la gramática del contrato.
+# Patrones nuevos que estresa: 4 slots críticos, un slot de DATOS runtime con piso
+# min_tokens en mitad del orden, mezcla summarize+truncate, 7 slots.
+ccdd_version: "0.1"
+contract:
+  name: "code-review-agent"
+  budget:
+    model: "claude-opus-4-8"
+    max_tokens: 2000
+    reserve_output: 400
+  slots:
+    - id: environment
+      priority: 0
+      source: { type: static, path: "env.txt", sign: true }
+      compaction: none
+      min_tokens: 20
+    - id: system
+      priority: 1
+      source: { type: static, path: "system.txt", sign: true }
+      compaction: none
+      min_tokens: 60
+    - id: tool_specs
+      priority: 1
+      source: { type: static, path: "tools.txt", sign: true }
+      compaction: none
+      min_tokens: 80
+    - id: safety_policies
+      priority: 1
+      source: { type: static, path: "policies.txt", sign: true }
+      compaction: none
+      min_tokens: 60
+    - id: diff_under_review
+      priority: 2                # el DATO central: alta prioridad...
+      source: { type: runtime }
+      compaction: truncate        # ...pero truncable si es enorme...
+      min_tokens: 200             # ...con piso: si no entran 200 tok del diff, abortar
+                                  # (no tiene sentido "revisar" una astilla de un diff gigante)
+    - id: repo_map
+      priority: 3
+      source: { type: dynamic, provider: "repo_indexer" }
+      compaction: summarize
+      max_tokens: 600
+    - id: lint_results
+      priority: 4
+      source: { type: dynamic, provider: "linter" }
+      compaction: truncate
+      max_tokens: 300
+  guardrails:
+    - id: no-secrets
+      type: regex_deny
+      pattern: "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)"
+      on_fail: abort
+    - id: slot-references
+      type: reference_check
+      on_fail: abort
