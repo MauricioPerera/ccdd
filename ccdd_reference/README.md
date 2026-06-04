@@ -55,10 +55,28 @@ contratos válidos pero flojos — `no-secrets-guardrail` (sin `regex_deny`), `c
 (slot crítico sin `min_tokens`), `unsigned-static` (estático con `sign:false`), `dynamic-in-critical-zone`
 (fuente no confiable con retención de política). Con `--json` salen como findings de severidad `warning`.
 
-## Asistente de revisión (`review_assist.py`) — ADVISORY, fuera del gate
+## Herramientas asistidas por IA — fuera del núcleo determinista
 
-Pieza **deliberadamente separada** de `ccdd.py`: usa un LLM local (LM Studio, endpoint
-OpenAI-compatible) para **ayudar al revisor humano** a juzgar si un cambio de política la
+Dos scripts viven **deliberadamente separados de `ccdd.py`** porque llaman a un LLM (LM Studio,
+endpoint OpenAI-compatible) y son no-deterministas. **Ninguno tiene autoridad**: producen borradores
+u opiniones que el humano revisa y firma. El núcleo `ccdd.py` no los invoca y no depende de ningún LLM.
+
+### `draft.py` — generar contenido de dominio sobre la base vetada
+
+Sobre un contrato creado con `ccdd init`, borronea el `system.txt` y reglas de política
+**específicas del dominio** a partir de una descripción en lenguaje natural — **sin tocar la base
+vetada** (solo agrega, bajo una sección marcada como borrador). Produce un borrador sin firmar.
+
+```bash
+python ccdd.py init my-agent --name my-agent           # estructura + base vetada (determinista)
+python draft.py my-agent --from "agente de soporte de un banco; nunca da consejos de inversión; escala fraude a un humano"
+python ccdd.py lint my-agent                           # revisás (sobre todo las políticas de dominio)
+python ccdd.py lint my-agent --sign                    # cuando estás conforme, firmás VOS
+```
+
+### `review_assist.py` — ADVISORY, fuera del gate
+
+Usa un LLM local para **ayudar al revisor humano** a juzgar si un cambio de política la
 debilita. Es no-determinista y **no tiene autoridad**: no bloquea, no firma, y el gate
 (`ccdd.py diff`) no lo invoca. El gate sigue exigiendo la atestación firmada del humano (R6).
 
@@ -146,7 +164,8 @@ contracts/support-agent/              contrato base (la "baseline")
   last-assembly.json                  registro auditable (generado por assemble)
 contracts/support-agent-bad/          variante regresada (demo del gate L2)
 contracts/code-review-agent/          segundo dominio (validación N=2, agente con tools)
-review_assist.py                      asistente LLM ADVISORY (LM Studio); fuera del gate
+draft.py                              generación de contenido de dominio asistida por IA (init->draft); fuera del núcleo
+review_assist.py                      asistente de revisión ADVISORY (LM Studio); fuera del gate
 tests/test_ccdd.py                    suite unittest (47 tests, solo el núcleo determinista)
 inputs.json                           entradas runtime — caso normal
 inputs_attack.json                    entradas runtime — secreto + injection

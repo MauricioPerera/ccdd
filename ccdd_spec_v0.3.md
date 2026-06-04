@@ -253,9 +253,13 @@ Una implementación conforme **NO DEBE** afirmar que aborda:
 
 Implementado y verificado en la referencia (`ccdd_reference/`, 47 tests): L1/L2/L3, gate R1–R9, guardrails `regex_deny`/`reference_check`/`json_schema`, atestación firmada Ed25519, gobernanza del registro y quórum M-de-N, export multi-framework, y **generación determinista del contrato (`init`) con biblioteca de políticas base vetada**.
 
+En la referencia, fuera del núcleo determinista (no-determinista, demo manual — requieren un LLM):
+
+- [x] **`draft` — generación de contenido de dominio asistida por IA** (`draft.py`), sobre la base vetada de `init`. Borronea el system prompt y reglas de dominio; **conserva la base vetada** y produce un borrador sin firmar que entra al flujo normal (lint → revisión humana → firma). La estructura y las políticas base siguen siendo deterministas; solo lo específico del dominio lo borronea un LLM, y nada se confía sin firma humana.
+- [x] **`review_assist`** — advisory para el revisor (§5.5).
+
 Abierto (v0.4):
 
-- [ ] **`draft` — generación de contenido de dominio asistida por IA**, sobre la base vetada de `init`, como borrador que entra al flujo normal (lint → revisión humana → firma). La estructura y las políticas base siguen siendo deterministas; solo lo específico del dominio lo borronea un LLM, y nada se confía sin firma humana.
 - [ ] Tokenizador real en lugar de la aproximación `chars/4`.
 - [ ] **Caducidad temporal / revocación explícita** de atestaciones (hoy solo caducan al cambiar el contenido).
 - [ ] Aislamiento estructural de slots `dynamic` (§6.5) ejecutado y verificado por la referencia.

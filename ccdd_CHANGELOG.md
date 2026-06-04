@@ -19,9 +19,18 @@ prioridades sanas) que lintea limpio (0 advertencias) y ensambla de una.
   + la línea base de **políticas vetada y determinista** (NO generada por un LLM, porque los modelos
   confabulan con las políticas) + firma humana. Lo específico del dominio se agrega encima.
 - Plantillas: `chat` (default) y `tool-agent` (agrega un slot `tool_specs`).
-- **Pendiente (v0.4):** `ccdd draft` — generación asistida por IA del contenido de dominio sobre la
-  base vetada, como borrador que entra al flujo normal (lint → revisión → firma).
 - Tests: +3 (44 → 47). Un test cazó un bug del template `tool-agent` (llaves mal escapadas).
+
+### Generación asistida por IA — `draft.py` (fuera del núcleo)
+Segunda capa de la generación, **no-determinista**, en un script separado de `ccdd.py` (como
+`review_assist.py`). Sobre un contrato de `init`, un LLM local borronea el `system.txt` y reglas de
+política **de dominio** a partir de una descripción en lenguaje natural.
+- **Conserva la base vetada**: el LLM solo AGREGA contenido de dominio bajo una sección marcada como
+  borrador; nunca reescribe las políticas base. Produce un **borrador sin firmar** — el humano revisa
+  y firma. Nada se confía sin firma humana.
+- No está en la suite determinista (requiere LLM, no-determinista): se demuestra a mano.
+- Cierra el flujo de creación híbrido: estructura determinista (`init`) → contenido asistido
+  (`draft`) → revisión + firma humana — el norte de CCDD aplicado a la propia redacción del contrato.
 
 ### Asistente de revisión LLM (advisory, fuera del gate)
 - **`review_assist.py`** (archivo separado de `ccdd.py`): usa un LLM local (LM Studio,
