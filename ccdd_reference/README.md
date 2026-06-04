@@ -118,7 +118,7 @@ como regresión. Por eso el LLM **informa pero no decide**, y el gate exige la f
 
 ## Tests
 
-Suite con `unittest` (stdlib). 47 tests (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
+Suite con `unittest` (stdlib). 49 tests (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
 incluida la firma de atestaciones y la defensa contra suplantación) que mapean cada escenario
 a una cláusula de la spec:
 
@@ -166,7 +166,7 @@ contracts/support-agent-bad/          variante regresada (demo del gate L2)
 contracts/code-review-agent/          segundo dominio (validación N=2, agente con tools)
 draft.py                              generación de contenido de dominio asistida por IA (init->draft); fuera del núcleo
 review_assist.py                      asistente de revisión ADVISORY (LM Studio); fuera del gate
-tests/test_ccdd.py                    suite unittest (47 tests, solo el núcleo determinista)
+tests/test_ccdd.py                    suite unittest (49 tests, solo el núcleo determinista)
 inputs.json                           entradas runtime — caso normal
 inputs_attack.json                    entradas runtime — secreto + injection
 inputs_codereview.json                entradas runtime — code-review-agent

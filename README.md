@@ -8,7 +8,7 @@
 > **contratos de contexto híbridos**. Como TDD pone el test primero y SDD pone la
 > especificación primero, **CCDD pone el contrato de contexto primero**.
 
-**Estado:** v0.3 (Draft) · metodología + implementación de referencia ejecutable · 47 tests verdes · validada en 2 dominios.
+**Estado:** v0.3 (Draft) · metodología + implementación de referencia ejecutable · 49 tests verdes · validada en 2 dominios.
 
 **TL;DR** — Tus prompts y políticas de LLM viven como texto suelto sin versionar. CCDD los vuelve un
 **contrato** (`context.yaml`) con: ✍️ firmas, 🚦 un gate de CI que bloquea regresiones de contexto,
@@ -152,7 +152,7 @@ python ccdd.py diff contracts/support-agent contracts/support-agent-bad
 # L3 — ensamblar el contexto para una interacción real
 python ccdd.py assemble contracts/support-agent --inputs inputs.json
 
-# tests (47, stdlib)
+# tests (49, stdlib)
 python -m unittest discover -s tests -p "test_*.py"
 ```
 

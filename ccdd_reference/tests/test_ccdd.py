@@ -508,5 +508,39 @@ class TestSecondContractN2(unittest.TestCase):
         self.assertIn("truncado bajo su piso", out)
 
 
+class TestDraftSafety(unittest.TestCase):
+    """Verifica el invariante de seguridad de `draft` SIN un LLM: la IA agrega contenido de
+    dominio pero NUNCA toca la base vetada de políticas. (La parte no-determinista —la llamada
+    al modelo— se prueba a mano; la parte determinista que protege la base, acá.)"""
+
+    def setUp(self):
+        import draft
+        self.draft = draft
+        self.tmp = Path(tempfile.mkdtemp(prefix="ccdd_draft_"))
+        self.cdir = self.tmp / "c"
+        run(ccdd.cmd_init, self.cdir, "c", "chat", False)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_preserves_vetted_baseline(self):
+        self.draft.apply_draft(self.cdir, "system prompt de prueba", "- regla de dominio A")
+        pol = (self.cdir / "policies.txt").read_text(encoding="utf-8")
+        self.assertIn("Nunca reveles claves", pol)               # base vetada CONSERVADA
+        self.assertIn("regla de dominio A", pol)                 # dominio agregado
+        self.assertIn(self.draft.DOMAIN_MARKER, pol)
+        self.assertEqual((self.cdir / "system.txt").read_text(encoding="utf-8").strip(),
+                         "system prompt de prueba")
+
+    def test_idempotent_replaces_not_accumulates(self):
+        self.draft.apply_draft(self.cdir, "sp", "- regla vieja")
+        self.draft.apply_draft(self.cdir, "sp", "- regla nueva")  # re-aplicar
+        pol = (self.cdir / "policies.txt").read_text(encoding="utf-8")
+        self.assertIn("Nunca reveles claves", pol)               # base intacta
+        self.assertIn("regla nueva", pol)
+        self.assertNotIn("regla vieja", pol)                     # reemplaza, no acumula
+        self.assertEqual(pol.count(self.draft.DOMAIN_MARKER), 1)  # un solo marcador
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

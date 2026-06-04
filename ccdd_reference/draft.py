@@ -24,6 +24,18 @@ import review_assist as ra  # reusa DEFAULT_ENDPOINT / DEFAULT_MODEL / DEFAULT_T
 DOMAIN_MARKER = "# --- DOMINIO (BORRADOR generado por IA — REVISAR antes de firmar) ---"
 
 
+def apply_draft(contract_dir: Path, system_prompt: str, domain_policies: str) -> None:
+    """Aplica un borrador a los archivos del contrato de forma DETERMINISTA, separada de la
+    llamada al LLM para poder VERIFICARLA sin un modelo. Invariante de seguridad:
+      - reemplaza `system.txt` (contenido blando),
+      - en `policies.txt` CONSERVA la base vetada y agrega el dominio bajo `DOMAIN_MARKER`,
+      - idempotente: re-aplicar reemplaza la sección de dominio, nunca duplica ni toca la base."""
+    (contract_dir / "system.txt").write_text(system_prompt.strip() + "\n", encoding="utf-8")
+    pol = contract_dir / "policies.txt"
+    base_only = pol.read_text(encoding="utf-8").split(DOMAIN_MARKER)[0].rstrip()
+    pol.write_text(f"{base_only}\n\n{DOMAIN_MARKER}\n{domain_policies.strip()}\n", encoding="utf-8")
+
+
 def chat(system: str, user: str, model: str, endpoint: str, timeout: int) -> str:
     body = json.dumps({
         "model": model,
@@ -72,13 +84,7 @@ def main() -> int:
         print(f"LLM no disponible ({e}). No se generó nada; completá los .txt a mano.")
         return 0
 
-    # system.txt: el LLM redacta el contenido blando (placeholder -> borrador)
-    (a.contract_dir / "system.txt").write_text(system_prompt + "\n", encoding="utf-8")
-
-    # policies.txt: se CONSERVA la base vetada; el dominio se agrega en una sección marcada.
-    pol = a.contract_dir / "policies.txt"
-    base_only = pol.read_text(encoding="utf-8").split(DOMAIN_MARKER)[0].rstrip()
-    pol.write_text(f"{base_only}\n\n{DOMAIN_MARKER}\n{domain_policies.strip()}\n", encoding="utf-8")
+    apply_draft(a.contract_dir, system_prompt, domain_policies)
 
     print("draft: BORRADOR escrito.")
     print("  · system.txt  (reemplazado por el system prompt propuesto)")

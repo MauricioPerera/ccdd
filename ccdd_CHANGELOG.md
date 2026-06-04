@@ -28,7 +28,9 @@ política **de dominio** a partir de una descripción en lenguaje natural.
 - **Conserva la base vetada**: el LLM solo AGREGA contenido de dominio bajo una sección marcada como
   borrador; nunca reescribe las políticas base. Produce un **borrador sin firmar** — el humano revisa
   y firma. Nada se confía sin firma humana.
-- No está en la suite determinista (requiere LLM, no-determinista): se demuestra a mano.
+- La llamada al LLM se demuestra a mano (no-determinista); pero el **invariante de seguridad**
+  —que `apply_draft` CONSERVA la base vetada y es idempotente— SÍ está en la suite determinista
+  (2 tests). La parte que protege la base se verifica; lo no-determinista queda afuera.
 - Cierra el flujo de creación híbrido: estructura determinista (`init`) → contenido asistido
   (`draft`) → revisión + firma humana — el norte de CCDD aplicado a la propia redacción del contrato.
 
