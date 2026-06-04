@@ -8,7 +8,7 @@
 > **contratos de contexto híbridos**. Como TDD pone el test primero y SDD pone la
 > especificación primero, **CCDD pone el contrato de contexto primero**.
 
-**Estado:** v0.3 (Draft) · metodología + implementación de referencia ejecutable · 44 tests verdes · validada en 2 dominios.
+**Estado:** v0.3 (Draft) · metodología + implementación de referencia ejecutable · 47 tests verdes · validada en 2 dominios.
 
 **TL;DR** — Tus prompts y políticas de LLM viven como texto suelto sin versionar. CCDD los vuelve un
 **contrato** (`context.yaml`) con: ✍️ firmas, 🚦 un gate de CI que bloquea regresiones de contexto,
@@ -139,6 +139,10 @@ Detalle normativo en [`ccdd_spec_v0.3.md` §5](ccdd_spec_v0.3.md).
 pip install pyyaml jsonschema
 cd ccdd_reference
 
+# 0 — generar un contrato base con buenas prácticas (plantilla determinista)
+python ccdd.py init my-agent --name my-agent     # crea my-agent/ con políticas base vetadas
+#   …completás los .txt, y firmás:  python ccdd.py lint my-agent --sign
+
 # L1 — declarar/verificar y firmar el contrato
 python ccdd.py lint contracts/support-agent --sign
 
@@ -148,7 +152,7 @@ python ccdd.py diff contracts/support-agent contracts/support-agent-bad
 # L3 — ensamblar el contexto para una interacción real
 python ccdd.py assemble contracts/support-agent --inputs inputs.json
 
-# tests (44, stdlib)
+# tests (47, stdlib)
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
@@ -167,7 +171,7 @@ intenciones". Esto es **soporte de la metodología**, no su esencia — actíval
 - **Asistente de revisión (opcional)** — un LLM local ayuda al revisor a juzgar un cambio, pero **no decide ni firma**: es la parte "blanda", fuera del gate.
 - **Auditoría** — cada interacción queda registrada y es reproducible bit a bit.
 
-Cada una de estas garantías tiene una corrida real y un test que la fija (las 44 pruebas). Detalle
+Cada una de estas garantías tiene una corrida real y un test que la fija (las 47 pruebas). Detalle
 en [`ccdd_spec_v0.3.md` §5–§6](ccdd_spec_v0.3.md) y la tabla de demostraciones en
 [`ccdd_reference/README.md`](ccdd_reference/README.md).
 

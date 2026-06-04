@@ -11,6 +11,18 @@ Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo 
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
 advisory con LLM dentro del gate) hacia atestación humana firmada, fuera del gate.
 
+### Generación de contratos — `ccdd init` (determinista)
+Hasta ahora el contrato se redactaba 100% a mano (la barrera de entrada). `init` genera un contrato
+base con **buenas prácticas por defecto** (críticos firmados con piso, guardrail anti-secretos,
+prioridades sanas) que lintea limpio (0 advertencias) y ensambla de una.
+- **Decisión de diseño:** la generación es ella misma híbrida — estructura **determinista** (plantilla)
+  + la línea base de **políticas vetada y determinista** (NO generada por un LLM, porque los modelos
+  confabulan con las políticas) + firma humana. Lo específico del dominio se agrega encima.
+- Plantillas: `chat` (default) y `tool-agent` (agrega un slot `tool_specs`).
+- **Pendiente (v0.4):** `ccdd draft` — generación asistida por IA del contenido de dominio sobre la
+  base vetada, como borrador que entra al flujo normal (lint → revisión → firma).
+- Tests: +3 (44 → 47). Un test cazó un bug del template `tool-agent` (llaves mal escapadas).
+
 ### Asistente de revisión LLM (advisory, fuera del gate)
 - **`review_assist.py`** (archivo separado de `ccdd.py`): usa un LLM local (LM Studio,
   endpoint OpenAI-compatible vía `urllib`, sin dependencias nuevas) para ayudar al revisor a

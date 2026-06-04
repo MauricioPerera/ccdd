@@ -14,6 +14,10 @@ pip install cryptography           # solo para keygen / attest / verificación d
 ## Uso
 
 ```bash
+# generar un contrato base con buenas prácticas (determinista; sin LLM)
+python ccdd.py init my-agent --name my-agent --template chat   # o --template tool-agent
+#   incluye una biblioteca de POLÍTICAS BASE vetada (no generada por IA); completá los .txt y `lint --sign`
+
 # CCDD-L1 — validar contra el esquema y firmar los estáticos
 python ccdd.py lint contracts/support-agent --sign
 
@@ -96,7 +100,7 @@ como regresión. Por eso el LLM **informa pero no decide**, y el gate exige la f
 
 ## Tests
 
-Suite con `unittest` (stdlib). 44 tests (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
+Suite con `unittest` (stdlib). 47 tests (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
 incluida la firma de atestaciones y la defensa contra suplantación) que mapean cada escenario
 a una cláusula de la spec:
 
@@ -130,7 +134,7 @@ registro de revisores (auto-registro bloqueado / cambio atestado / génesis).
 ## Mapa de archivos
 
 ```
-ccdd.py                               CLI: lint (L1) + diff (L2) + keygen/attest (v0.3) + assemble (L3)
+ccdd.py                               CLI: init (scaffold) + lint (L1) + diff (L2) + keygen/attest (v0.3) + assemble (L3)
                                       + export (a openai/anthropic/text) + spec (catálogo de reglas)
                                       reviewers.json (claves públicas, versionado) lo genera keygen;
                                       attestations.json (firmadas, versionado) lo genera attest;
@@ -143,7 +147,7 @@ contracts/support-agent/              contrato base (la "baseline")
 contracts/support-agent-bad/          variante regresada (demo del gate L2)
 contracts/code-review-agent/          segundo dominio (validación N=2, agente con tools)
 review_assist.py                      asistente LLM ADVISORY (LM Studio); fuera del gate
-tests/test_ccdd.py                    suite unittest (44 tests, solo el núcleo determinista)
+tests/test_ccdd.py                    suite unittest (47 tests, solo el núcleo determinista)
 inputs.json                           entradas runtime — caso normal
 inputs_attack.json                    entradas runtime — secreto + injection
 inputs_codereview.json                entradas runtime — code-review-agent

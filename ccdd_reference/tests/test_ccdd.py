@@ -101,6 +101,28 @@ class TestLintL1(Base):
         self.assertIn("findings", data)
         self.assertEqual(data["errors"], 0)
 
+    def test_init_creates_clean_contract(self):                 # generación determinista
+        d = self.tmp / "fresh"
+        code, out = run(ccdd.cmd_init, d, "fresh", "chat", False)
+        self.assertEqual(code, 0)                               # el esqueleto lintea OK
+        self.assertNotIn("advertencia", out)                    # buenas prácticas: 0 warnings
+        self.assertTrue((d / "context.yaml").exists())
+        self.assertIn("prompt injection", (d / "policies.txt").read_text(encoding="utf-8"))  # base vetada
+
+    def test_init_tool_agent_has_tool_specs(self):
+        d = self.tmp / "ta"
+        run(ccdd.cmd_init, d, "ta", "tool-agent", False)
+        c = yaml.safe_load((d / "context.yaml").read_text(encoding="utf-8"))
+        self.assertTrue(any(s["id"] == "tool_specs" for s in c["contract"]["slots"]))
+        self.assertTrue((d / "tools.txt").exists())
+
+    def test_init_refuses_overwrite(self):
+        d = self.tmp / "ow"
+        run(ccdd.cmd_init, d, "ow", "chat", False)
+        code, out = run(ccdd.cmd_init, d, "ow", "chat", False)  # sin --force
+        self.assertEqual(code, 1)
+        self.assertIn("ya existe", out)
+
     def test_reference_check_bad_target(self):                  # spec §3.3
         c = self.load()
         c["contract"]["guardrails"].append(
