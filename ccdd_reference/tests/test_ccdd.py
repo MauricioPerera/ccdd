@@ -564,8 +564,12 @@ class TestDocConsistency(unittest.TestCase):
         # Residual honesto: marcar es opt-in (un conteo nuevo sin marcar es invisible) — parte blanda.
         import re
         repo = REF_DIR.parent
-        src = (REF_DIR / "tests" / "test_ccdd.py").read_text(encoding="utf-8")
-        actual = len(re.findall(r"^    def test_", src, re.M))
+        # Fuente de verdad = el conteo de RUNTIME de lo que corre el CI (todos los `test_*.py`, sin
+        # depender de indentación ni de qué haya dentro de un string), no un regex sobre un archivo.
+        # (8ª inconsistencia: el regex sobre test_ccdd.py era ciego a un 2º archivo de tests y a las
+        #  clases anidadas — el patrón `chars/4` recursado hasta el verificador. Ahora se mide, no se
+        #  aproxima: este número es el mismo que reporta `Ran N tests`.)
+        actual = unittest.TestLoader().discover(str(REF_DIR / "tests"), "test_*.py").countTestCases()
         checked = 0
         files = sorted(set(repo.rglob("*.md")) | set(repo.rglob("*.yml")) | set(repo.rglob("*.yaml")))
         for f in files:

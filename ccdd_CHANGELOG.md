@@ -39,6 +39,14 @@ inconsistencias de documentación —drift entre los docs y el código— y un h
 - **7ª: el `(44 tests)` del nombre del step del workflow** —el número original de todo el hilo—
   sobrevivió 5 rondas escondido en un `.yml`, fuera del alcance del guardián. v3 escanea `.md` **y**
   `.yml`, y el conteo se sacó del nombre del step.
+- **8ª (la más de fondo), de una 4ª revisión externa: la "realidad" del guardián era una
+  aproximación.** Contaba `^    def test_` por regex sobre **un** archivo (`test_ccdd.py`), pero el
+  CI corre `discover -p "test_*.py"` sobre **todos**. Un 2º archivo de tests, una clase anidada, o un
+  `def test_` en un docstring, y el conteo divergía en silencio. Es el patrón `chars/4` recursado
+  hasta el verificador: una *aproximación de la medición* en lugar de la medición. **v4:** la fuente
+  de verdad es `unittest.TestLoader().discover(...).countTestCases()` — exactamente lo que reporta
+  `Ran N tests`, en todos los archivos, sin depender de indentación ni de strings. Verificado
+  adversarialmente: con un 2º `test_*.py` el guardián ahora **sí** falla (52 ≠ 51).
 
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
