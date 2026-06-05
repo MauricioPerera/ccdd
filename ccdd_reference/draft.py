@@ -33,7 +33,9 @@ def apply_draft(contract_dir: Path, system_prompt: str, domain_policies: str) ->
     (contract_dir / "system.txt").write_text(system_prompt.strip() + "\n", encoding="utf-8")
     pol = contract_dir / "policies.txt"
     base_only = pol.read_text(encoding="utf-8").split(DOMAIN_MARKER)[0].rstrip()
-    pol.write_text(f"{base_only}\n\n{DOMAIN_MARKER}\n{domain_policies.strip()}\n", encoding="utf-8")
+    # el contenido del modelo no puede inyectar un 2º marcador (mantiene la idempotencia exacta)
+    domain = domain_policies.replace(DOMAIN_MARKER, "").strip()
+    pol.write_text(f"{base_only}\n\n{DOMAIN_MARKER}\n{domain}\n", encoding="utf-8")
 
 
 def chat(system: str, user: str, model: str, endpoint: str, timeout: int) -> str:

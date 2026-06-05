@@ -541,6 +541,31 @@ class TestDraftSafety(unittest.TestCase):
         self.assertNotIn("regla vieja", pol)                     # reemplaza, no acumula
         self.assertEqual(pol.count(self.draft.DOMAIN_MARKER), 1)  # un solo marcador
 
+    def test_model_cannot_inject_second_marker(self):           # hueco hallado en revisión externa
+        # si la salida del modelo trae un DOMAIN_MARKER literal, no debe duplicarse
+        self.draft.apply_draft(self.cdir, "sp", f"- regla\n{self.draft.DOMAIN_MARKER}\n- otra")
+        pol = (self.cdir / "policies.txt").read_text(encoding="utf-8")
+        self.assertEqual(pol.count(self.draft.DOMAIN_MARKER), 1)  # un solo marcador, no dos
+        self.assertIn("Nunca reveles claves", pol)               # base intacta
+
+
+class TestDocConsistency(unittest.TestCase):
+    """Pone el propio claim de conteo bajo verificación: evita el drift de docs que una
+    revisión externa encontró (49/47/44 en distintos archivos). Si agregás un test, tenés
+    que actualizar los docs o esto falla — la tesis de CCDD aplicada al propio repo."""
+
+    def test_doc_test_counts_match_reality(self):
+        import re
+        repo = REF_DIR.parent
+        src = (REF_DIR / "tests" / "test_ccdd.py").read_text(encoding="utf-8")
+        actual = len(re.findall(r"^    def test_", src, re.M))
+        for md in sorted(repo.glob("*.md")):
+            if md.name == "ccdd_CHANGELOG.md":          # los deltas históricos son números viejos válidos
+                continue
+            for n in re.findall(r"(\d+) tests verdes", md.read_text(encoding="utf-8")):
+                self.assertEqual(int(n), actual,
+                                 f"{md.name}: dice '{n} tests verdes' pero hay {actual} tests reales")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -63,17 +63,14 @@ El desarrollo comienza definiendo los límites de información del agente. En lu
 
 ### 2. Desarrollo Local y Firmas Estáticas
 El desarrollador escribe los prompts estáticos e instrucciones. El framework CCDD:
-- Genera firmas criptográficas (`SHA-256`) de los archivos estáticos (`system.txt`, `guidelines.txt`).
+- Genera firmas criptográficas (`SHA-256`) de los archivos estáticos (`system.txt`, `policies.txt`).
 - Ejecuta `lint` en local para garantizar que los prompts no tengan referencias rotas a otros slots y que se ajusten a los presupuestos.
 - Guarda el archivo `expected-hashes.json` en el repositorio Git.
 
 ### 3. Integración Continua de Contexto (CCI)
-Cada Pull Request que altere las instrucciones del agente o el contrato de contexto activa un paso de verificación en CI:
-- **`diff` Semántico**: Compara el contrato de la rama origen contra `main`.
-- **Detección de Regresiones**: Bloquea automáticamente el merge si:
-  - Se reduce el presupuesto total de tokens disponible.
-  - Se disminuye la prioridad de un slot crítico (ej. degradar `system` o `policies` por debajo de `user_message`), lo que expondría el agente a ataques de secuestro de contexto (Prompt Injection).
-  - Un desarrollador modificó las políticas estáticas sin actualizar y firmar criptográficamente el hash.
+Cada Pull Request que altere las instrucciones del agente o el contrato de contexto activa un paso de verificación **determinista** (sin LLM) en CI:
+- **`diff` de contrato**: compara el contrato de la rama contra `main`. La implementación de referencia aplica **9 reglas deterministas (R1–R9)** que bloquean automáticamente el merge si un cambio debilita la postura del contexto — entre ellas: baja del presupuesto (R1); degradación de prioridad de un slot crítico (R2), que expondría a secuestro de contexto / prompt injection; modificación de un estático firmado sin re-firmar el hash (R4); eliminación o debilitamiento de un guardrail (R9); o cambio de una política sin atestación firmada que alcance el quórum (R6–R8).
+- **El juicio "blando" NO vive en el gate.** Decidir si una *reescritura* debilita una política es no-determinista, así que lo hace un **humano** —opcionalmente asistido por un modelo (`review_assist.py`)— *fuera* del camino determinista. El gate solo verifica firmas; el humano revisa, decide y firma. (Ver especificación `ccdd_spec_v0.3.md` §5.5.)
 
 ### 4. Orquestación y Guardrails en Caliente (Runtime)
 Cuando el usuario interactúa con la aplicación en producción:

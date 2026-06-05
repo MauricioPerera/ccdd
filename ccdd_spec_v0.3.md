@@ -251,7 +251,7 @@ Una implementación conforme **NO DEBE** afirmar que aborda:
 
 ## 7. Roadmap a v0.4
 
-Implementado y verificado en la referencia (`ccdd_reference/`, 49 tests): L1/L2/L3, gate R1–R9, guardrails `regex_deny`/`reference_check`/`json_schema`, atestación firmada Ed25519, gobernanza del registro y quórum M-de-N, export multi-framework, y **generación determinista del contrato (`init`) con biblioteca de políticas base vetada**.
+Implementado y verificado en la referencia (`ccdd_reference/`, 51 tests): L1/L2/L3, gate R1–R9, guardrails `regex_deny`/`reference_check`/`json_schema`, atestación firmada Ed25519, gobernanza del registro y quórum M-de-N, export multi-framework, y **generación determinista del contrato (`init`) con biblioteca de políticas base vetada**.
 
 En la referencia, fuera del núcleo determinista (no-determinista, demo manual — requieren un LLM):
 

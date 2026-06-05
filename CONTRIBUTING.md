@@ -33,7 +33,7 @@ Tres bypasses ya se encontraron así y se cerraron (R6 ampliada, R8, R9) — ver
 ```bash
 cd ccdd_reference
 pip install pyyaml jsonschema cryptography
-python -m unittest discover -s tests -p "test_*.py"   # 49 tests
+python -m unittest discover -s tests -p "test_*.py"   # 51 tests
 ```
 
 La implementación de referencia es deliberadamente mínima (Python stdlib + 3 deps) y existe para

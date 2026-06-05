@@ -7,6 +7,21 @@ referencia**. La spec publicada es `ccdd_spec_v0.3.md` (v0.1 y v0.2 se conservan
 
 ## v0.3 — Draft
 
+### Correcciones de una revisión adversaria externa
+Una pasada independiente (clonar el remoto, leer el código, correr la suite) encontró 4
+inconsistencias de documentación —drift entre los docs y el código— y un hueco de test:
+- **Conteo de tests desincronizado** (49/47/44 en distintos archivos) → todo sincronizado.
+- **Docstring de `ccdd.py`** decía `R1–R7`; el gate es `R1–R9` → corregido.
+- **Teaser del README** era una salida compuesta, no real → reemplazado por la salida literal de `diff`.
+- **Manifiesto (`ccdd_workflow.md`) §3** describía el gate como *"diff Semántico"* con 3 reglas (modelo
+  viejo R1–R4), **invirtiendo el claim central** (el gate es determinista R1–R9; lo semántico/LLM es
+  advisory FUERA del gate). Reescrito + corregido el `guidelines.txt` fantasma.
+- **Hueco en `draft.apply_draft`**: si el modelo emitía un `DOMAIN_MARKER` literal, quedaban dos
+  marcadores → ahora se sanitiza; test de regresión agregado.
+- **Fix sistémico:** un test (`TestDocConsistency`) ahora verifica que todo claim `"N tests verdes"`
+  en los docs coincida con los tests reales — el drift de conteo no puede repetirse en silencio.
+  *(La doc no estaba bajo contrato y derivó: un argumento involuntario a favor de la propia tesis.)*
+
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
 advisory con LLM dentro del gate) hacia atestación humana firmada, fuera del gate.
