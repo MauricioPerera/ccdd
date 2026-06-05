@@ -120,6 +120,33 @@ Detalle normativo en [`ccdd_spec_v0.3.md` §5](ccdd_spec_v0.3.md).
 
 ---
 
+## Caso real (worked example)
+
+[**`n8n-generator`**](https://github.com/MauricioPerera/n8n-generator) aplica CCDD de punta a punta
+a un agente que genera flujos de n8n (LLM local + servidor MCP). Sus prompts (`system.txt`,
+`sdk_reference.txt`) son un **contrato `context.yaml`** con slots, presupuesto y guardrails — y los
+tres niveles están **enforceados, no solo demostrados**:
+
+- **L1 + L2 en CI** — un workflow corre `ccdd lint` y `ccdd diff` en cada PR, pinneado por **SHA
+  inmutable** a un release de esta referencia. Es un *required check*: un cambio que debilite el
+  contrato no puede mergearse.
+- **L3 en runtime** — el pipeline corre `ccdd assemble` + guardrails antes de cada inferencia y
+  aborta si un guardrail bloquea.
+- **Gobernanza activa** — `main` está protegida; cambiar un prompt **firmado** exige una atestación
+  Ed25519 de revisor, que la rama hace cumplir.
+
+Lo que el caso demostró, **verificado en CI**:
+
+1. El gate **bloqueó** una corrección correcta de un prompt firmado por faltarle la atestación (R6),
+   y **la admitió** una vez que un humano la firmó — el mismo cambio, rojo y luego verde.
+2. Un **push directo** que cambió un prompt sin atestación fue exactamente lo que R6 habría frenado;
+   se cerró con la firma y se previno con la rama protegida.
+
+Es la tesis instanciada: la IA ejecutó, el gate determinista verificó, y ningún cambio gobernado
+entró sin la firma humana que la metodología **hace cumplir**.
+
+---
+
 ## Mapa de artefactos y orden de lectura
 
 | # | Artefacto | Qué es | Para quién |
