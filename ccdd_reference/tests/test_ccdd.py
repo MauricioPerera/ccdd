@@ -563,13 +563,13 @@ class TestDocConsistency(unittest.TestCase):
         # workflow vivía fuera del alcance). Históricos/subconjuntos van sin marcador, a propósito.
         # Residual honesto: marcar es opt-in (un conteo nuevo sin marcar es invisible) — parte blanda.
         import re
+        import run_tests
         repo = REF_DIR.parent
-        # Fuente de verdad = el conteo de RUNTIME de lo que corre el CI (todos los `test_*.py`, sin
-        # depender de indentación ni de qué haya dentro de un string), no un regex sobre un archivo.
-        # (8ª inconsistencia: el regex sobre test_ccdd.py era ciego a un 2º archivo de tests y a las
-        #  clases anidadas — el patrón `chars/4` recursado hasta el verificador. Ahora se mide, no se
-        #  aproxima: este número es el mismo que reporta `Ran N tests`.)
-        actual = unittest.TestLoader().discover(str(REF_DIR / "tests"), "test_*.py").countTestCases()
+        # Fuente de verdad = el conteo de RUNTIME, derivado de la MISMA invocación canónica que corre
+        # el CI (`run_tests.discover_tests()`), no de una 2ª declaración del patrón ni de un regex.
+        # (8ª: el regex sobre un archivo era ciego a un 2º test_*.py y a clases anidadas. 9ª: el patrón
+        #  estaba duplicado literal en el .yml y acá → colapsado a `run_tests.py`, una sola fuente.)
+        actual = run_tests.discover_tests().countTestCases()
         checked = 0
         files = sorted(set(repo.rglob("*.md")) | set(repo.rglob("*.yml")) | set(repo.rglob("*.yaml")))
         for f in files:

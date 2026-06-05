@@ -17,4 +17,4 @@ jobs:
         run: pip install pyyaml jsonschema cryptography
       - name: Run reference test suite
         working-directory: ccdd_reference
-        run: python -m unittest discover -s tests -p "test_*.py" -v
+        run: python run_tests.py        # invocación canónica única (ver run_tests.py); el meta-test deriva su conteo de la misma fuente

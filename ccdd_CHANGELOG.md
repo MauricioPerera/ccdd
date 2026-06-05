@@ -47,6 +47,14 @@ inconsistencias de documentación —drift entre los docs y el código— y un h
   de verdad es `unittest.TestLoader().discover(...).countTestCases()` — exactamente lo que reporta
   `Ran N tests`, en todos los archivos, sin depender de indentación ni de strings. Verificado
   adversarialmente: con un 2º `test_*.py` el guardián ahora **sí** falla (52 ≠ 51).
+- **9ª: el patrón `test_*.py` estaba duplicado literal** en el `.yml` del CI y en el meta-test — dos
+  declaraciones de la misma intención que podían divergir en silencio. La revisión externa precisó que
+  *sincronizarlas* solo reubica la convención; la clausura real es **colapsarlas a una**. **v5:** un
+  runner canónico (`run_tests.py`) es la única fuente de `(dir, patrón)`; el workflow lo invoca y el
+  meta-test deriva su conteo de la misma `discover_tests()`. Ya no hay un 2º literal que sincronizar.
+  Verificado: con un 2º `test_*.py`, *ambas* vías (CI y guardián) ven 52 — no pueden divergir.
+  El residual irreducible (que el CI invoque ese entrypoint) es donde un verificador deja de poder
+  verificarse sin un tercero de confianza: ahí **decide un humano**, no el código — y queda dicho.
 
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
