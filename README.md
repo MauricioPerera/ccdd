@@ -16,11 +16,12 @@
 revisa una máquina; lo opinable, un humano.
 
 ```console
-$ ccdd diff main/  pr-branch/        # alguien debilitó una política en el PR
+$ python ccdd.py diff contracts/support-agent contracts/support-agent-bad   # salida real, recortada
 DIFF: BLOQUEADO - regresiones de contexto detectadas:
-  [X] slot crítico 'policies': contenido modificado sin atestación firmada
-  [X] guardrail 'no-secrets' eliminado
-exit 1                                # el merge se frena
+  [X] slot crítico 'policies': prioridad degradada 1 -> 3
+  [X] slot 'environment' perdió la firma (sign: true -> false)
+  [X] guardrail 'slot-references' eliminado
+  … (6 regresiones en total)         # el merge se frena (exit 1)
 ```
 
 → **¿Por qué existe?** [Propuesta](ccdd_PROPOSAL.md) · **¿Cómo lo presento?** [Pitch](ccdd_PITCH.md) ·
@@ -171,7 +172,7 @@ intenciones". Esto es **soporte de la metodología**, no su esencia — actíval
 - **Asistente de revisión (opcional)** — un LLM local ayuda al revisor a juzgar un cambio, pero **no decide ni firma**: es la parte "blanda", fuera del gate.
 - **Auditoría** — cada interacción queda registrada y es reproducible bit a bit.
 
-Cada una de estas garantías tiene una corrida real y un test que la fija (las 47 pruebas). Detalle
+Cada una de estas garantías tiene una corrida real y un test que la fija (las 49 pruebas). Detalle
 en [`ccdd_spec_v0.3.md` §5–§6](ccdd_spec_v0.3.md) y la tabla de demostraciones en
 [`ccdd_reference/README.md`](ccdd_reference/README.md).
 

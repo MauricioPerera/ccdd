@@ -5,7 +5,7 @@ CCDD — Implementación de referencia (v0.3).
 Cubre, de forma deliberadamente simple y auditable:
   - lint     (CCDD-L1): valida contra el esquema, referencias, presupuesto, y firma
              los estáticos (expected-hashes.json).
-  - diff     (CCDD-L2): gate de regresión con 7 reglas deterministas (R1–R7), incluida
+  - diff     (CCDD-L2): gate de regresión con 9 reglas deterministas (R1–R9), incluida
              la gobernanza del registro de revisores y el quórum.
   - keygen / attest (v0.3): par Ed25519 de un revisor y atestación firmada de cambios
              de política; el gate L2 las verifica con quórum.
