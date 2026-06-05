@@ -6,7 +6,7 @@ contexto que recibe el LLM como un contrato híbrido: declarado, versionado y ve
 > Como TDD pone el test primero y SDD pone la especificación primero, **CCDD pone el contrato de
 > contexto primero.**
 
-Estado: v0.3 (Draft) · implementación de referencia ejecutable · **51 tests verdes** · validada en 2 dominios. <!-- ccdd:test-count -->
+Estado: v0.3 (Draft) · implementación de referencia ejecutable · **51 tests verdes** · validada en 2 dominios. <!-- ccdd:test-count=51 -->
 
 ---
 

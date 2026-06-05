@@ -28,6 +28,17 @@ inconsistencias de documentación —drift entre los docs y el código— y un h
   (`FINDINGS`: "39 tests del núcleo") van sin marcador y quedan fuera, a propósito. Distinguir
   "total actual" de "histórico/subset" es un **juicio** → es la frontera dura/blanda aplicada al
   propio meta-test. Verificado adversarialmente (rompe ante `las 99 pruebas`).
+- **6ª (la más recursiva), de una 3ª revisión externa: la v2 rompía el build.** Al pasar a
+  recursivo, la v2 dejó de excluir el CHANGELOG; y como el CHANGELOG **documenta** el marcador
+  escribiendo el token literal, el guardián tropezaba con su propia explicación → `AssertionError`
+  en CI (que yo había reportado verde por error, vigilando el run anterior por una carrera). El
+  guardián no distinguía *marcador activo* de *marcador citado*: eran el mismo string.
+  **v3:** el número va **embebido** en el marcador (`ccdd:test-count=N`); la forma genérica usada al
+  documentar no matchea y se ignora. Verificado adversarialmente (rompe ante un `=99`; ignora menciones
+  genéricas en este mismo archivo).
+- **7ª: el `(44 tests)` del nombre del step del workflow** —el número original de todo el hilo—
+  sobrevivió 5 rondas escondido en un `.yml`, fuera del alcance del guardián. v3 escanea `.md` **y**
+  `.yml`, y el conteo se sacó del nombre del step.
 
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check

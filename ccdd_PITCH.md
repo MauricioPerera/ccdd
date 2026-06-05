@@ -10,7 +10,7 @@ del orador*. Pensado para una charla de 10–15 min o un README animado.
 **CCDD — Context Contract-Driven Development**
 *Tratá el contexto de tu LLM como un contrato. Versionado, verificable, gobernado.*
 
-`v0.3 · implementación de referencia · 51 tests verdes · 2 dominios` <!-- ccdd:test-count -->
+`v0.3 · implementación de referencia · 51 tests verdes · 2 dominios` <!-- ccdd:test-count=51 -->
 
 > *Nota:* el gancho de una línea — "como TDD pone el test primero, CCDD pone el contrato de contexto primero."
 
@@ -88,7 +88,7 @@ Demos en vivo (todas con test que las fija):
 - `attest` **firma** un cambio revisado (Ed25519); una atestación falsa **no verifica**.
 - `export` emite el **mismo contrato** a formato OpenAI *y* Anthropic.
 
-`51 tests verdes · gate de 9 reglas · stdlib + 3 deps` <!-- ccdd:test-count -->
+`51 tests verdes · gate de 9 reglas · stdlib + 3 deps` <!-- ccdd:test-count=51 -->
 
 > *Nota:* si hay tiempo, demo en vivo de `diff` bloqueando. Es lo más convincente.
 

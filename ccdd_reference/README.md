@@ -118,7 +118,7 @@ como regresión. Por eso el LLM **informa pero no decide**, y el gate exige la f
 
 ## Tests
 
-Suite con `unittest` (stdlib). 51 tests <!-- ccdd:test-count --> (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
+Suite con `unittest` (stdlib). 51 tests <!-- ccdd:test-count=51 --> (L1/L2/L3 + validación N=2 + features v0.2/v0.3-track,
 incluida la firma de atestaciones y la defensa contra suplantación) que mapean cada escenario
 a una cláusula de la spec:
 
