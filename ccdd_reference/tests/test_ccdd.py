@@ -554,17 +554,30 @@ class TestDocConsistency(unittest.TestCase):
     revisión externa encontró (49/47/44 en distintos archivos). Si agregás un test, tenés
     que actualizar los docs o esto falla — la tesis de CCDD aplicada al propio repo."""
 
+    MARKER = "<!-- ccdd:test-count -->"
+
     def test_doc_test_counts_match_reality(self):
+        # Decisión explícita (la frontera dura/blanda aplicada al propio meta-test): SOLO se
+        # vigilan los conteos MARCADOS con `<!-- ccdd:test-count -->`, que declaran el total
+        # ACTUAL. Los conteos históricos (specs viejas, CHANGELOG) y los subconjuntos (FINDINGS:
+        # "39 tests del núcleo") van SIN marcador y quedan fuera, a propósito. Recursivo y
+        # agnóstico a la redacción ("tests" | "pruebas") — cierra el hueco de la v1 de este test.
         import re
         repo = REF_DIR.parent
         src = (REF_DIR / "tests" / "test_ccdd.py").read_text(encoding="utf-8")
         actual = len(re.findall(r"^    def test_", src, re.M))
-        for md in sorted(repo.glob("*.md")):
-            if md.name == "ccdd_CHANGELOG.md":          # los deltas históricos son números viejos válidos
-                continue
-            for n in re.findall(r"(\d+) tests verdes", md.read_text(encoding="utf-8")):
-                self.assertEqual(int(n), actual,
-                                 f"{md.name}: dice '{n} tests verdes' pero hay {actual} tests reales")
+        checked = 0
+        for md in sorted(repo.rglob("*.md")):
+            for line in md.read_text(encoding="utf-8").splitlines():
+                if self.MARKER not in line:
+                    continue
+                nums = re.findall(r"(\d+)\s+(?:tests?|pruebas)", line)
+                self.assertTrue(nums, f"{md.name}: línea marcada sin conteo: {line.strip()!r}")
+                for n in nums:
+                    checked += 1
+                    self.assertEqual(int(n), actual,
+                                     f"{md.name}: conteo marcado '{n}' != {actual} tests reales")
+        self.assertGreaterEqual(checked, 4, "faltan marcadores `ccdd:test-count` en los docs")
 
 
 if __name__ == "__main__":

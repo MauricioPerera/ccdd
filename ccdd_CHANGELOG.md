@@ -18,9 +18,16 @@ inconsistencias de documentación —drift entre los docs y el código— y un h
   advisory FUERA del gate). Reescrito + corregido el `guidelines.txt` fantasma.
 - **Hueco en `draft.apply_draft`**: si el modelo emitía un `DOMAIN_MARKER` literal, quedaban dos
   marcadores → ahora se sanitiza; test de regresión agregado.
-- **Fix sistémico:** un test (`TestDocConsistency`) ahora verifica que todo claim `"N tests verdes"`
-  en los docs coincida con los tests reales — el drift de conteo no puede repetirse en silencio.
-  *(La doc no estaba bajo contrato y derivó: un argumento involuntario a favor de la propia tesis.)*
+- **Fix sistémico (v1):** un test (`TestDocConsistency`) verifica que los claims de conteo en los
+  docs coincidan con los tests reales — el drift de conteo no puede repetirse en silencio.
+- **5ª inconsistencia (recursiva), hallada en una 2ª revisión externa:** la v1 del meta-test tenía
+  *el mismo punto ciego que vino a tapar* — su regex (`tests verdes`) y su glob no-recursivo dejaban
+  fuera las redacciones que de hecho derivaron (`las N pruebas`, `N tests` a secas) y el subdirectorio.
+  **v2:** se vigilan SOLO los conteos **marcados** con `<!-- ccdd:test-count -->` (los del total
+  actual), recursivo y agnóstico a la redacción; los históricos (specs viejas) y subconjuntos
+  (`FINDINGS`: "39 tests del núcleo") van sin marcador y quedan fuera, a propósito. Distinguir
+  "total actual" de "histórico/subset" es un **juicio** → es la frontera dura/blanda aplicada al
+  propio meta-test. Verificado adversarialmente (rompe ante `las 99 pruebas`).
 
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
