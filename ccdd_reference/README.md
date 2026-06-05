@@ -1,4 +1,4 @@
-# CCDD — Implementación de referencia (v0.2 + v0.3-track)
+# CCDD — Implementación de referencia (v0.3)
 
 Implementación mínima y auditable que vuelve **demostrable** la especificación
 [`../ccdd_spec_v0.3.md`](../ccdd_spec_v0.3.md). No es producción: el tokenizador
@@ -138,7 +138,7 @@ registro de revisores (auto-registro bloqueado / cambio atestado / génesis).
 | :--- | :--- | :--- |
 | `lint --sign` | §5.1 L1 — firmas SHA-256 | genera `expected-hashes.json` |
 | `lint` tras editar un estático | §6.2 C3 — tamper | **LINT: FALLÓ** (hash no coincide) |
-| `diff` good vs `support-agent-bad` | §5.2 L2 — regresiones | **DIFF: BLOQUEADO** con 5 regresiones (presupuesto, firma, prioridad, criticidad, injection) |
+| `diff` good vs `support-agent-bad` | §5.2 L2 — regresiones | **DIFF: BLOQUEADO** con 6 regresiones (presupuesto, firma, prioridad, criticidad, injection, guardrail eliminado) |
 | reescribir política → `diff` → `keygen`+`attest` firmado → `diff` | §5.2 R6 + v0.3 | bloquea sin atestación; pasa con firma válida; **caduca** al volver a cambiar |
 | atestación fabricada por un impostor (sin la clave) | v0.3 modelo de confianza | `diff` **BLOQUEA**: la firma no verifica / revisor no registrado en la baseline |
 | un atacante se auto-registra en `reviewers.json` | v0.3 R7 gobernanza | `diff` **BLOQUEA**: el cambio del registro no fue atestado por un revisor existente |
@@ -166,6 +166,7 @@ contracts/support-agent-bad/          variante regresada (demo del gate L2)
 contracts/code-review-agent/          segundo dominio (validación N=2, agente con tools)
 draft.py                              generación de contenido de dominio asistida por IA (init->draft); fuera del núcleo
 review_assist.py                      asistente de revisión ADVISORY (LM Studio); fuera del gate
+run_tests.py                          invocación canónica de la suite (la usan el CI y el meta-test)
 tests/test_ccdd.py                    suite unittest (núcleo determinista)
 inputs.json                           entradas runtime — caso normal
 inputs_attack.json                    entradas runtime — secreto + injection
@@ -174,9 +175,10 @@ inputs_codereview.json                entradas runtime — code-review-agent
 
 ## Cobertura vs spec (qué NO hace todavía)
 
-- El `diff` L2 cubre regresiones **estructurales (R1–R5)** + **contenido de políticas (R6)** +
-  **gobernanza del registro (R7)**, todas deterministas. El debilitamiento de una política por
-  *reescritura* se resuelve con atestación humana firmada (no con un LLM en el gate).
+- El `diff` L2 cubre **las 9 reglas (R1–R9)**, todas deterministas: estructura (R1–R5), contenido de
+  políticas con atestación firmada (R6), gobernanza del registro (R7), quórum (R8) y guardrails (R9).
+  El debilitamiento de una política por *reescritura* se resuelve con atestación humana firmada (no
+  con un LLM en el gate).
 - `summarize` recorta, no resume con LLM (declarado no-determinista en §6).
 - El "tokenizador" es aproximado (`chars/4`); enchufar uno real no cambia la lógica.
 - El quórum **M-de-N** (`review_quorum` por slot, `__quorum__` para el registro) ya está; el

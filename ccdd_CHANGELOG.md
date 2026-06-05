@@ -56,6 +56,15 @@ inconsistencias de documentación —drift entre los docs y el código— y un h
   El residual irreducible (que el CI invoque ese entrypoint) es donde un verificador deja de poder
   verificarse sin un tercero de confianza: ahí **decide un humano**, no el código — y queda dicho.
 
+### Alineación código ↔ spec ↔ doc
+Pasada de consistencia tomando el **código como fuente de verdad** (8 comandos, gate R1–R9, 4 lints
+de calidad, 3 tipos de guardrail, 6 regresiones reales en `support-agent-bad`, schema con
+`review_quorum`). Corregido en `ccdd_reference/README.md`: "5 regresiones" → **6** (faltaba el
+guardrail eliminado); la cobertura decía el gate cubre **R1–R7** → **R1–R9** (faltaban R8/R9, que la
+misma página ya citaba); agregado `run_tests.py` al mapa de archivos; título `(v0.2 + v0.3-track)` →
+`(v0.3)`. En `ccdd_FINDINGS.md`: sacado un "39 tests" stale (descripción del núcleo, no claim de
+estado). Verificado que schema (enums de `type`/`compaction`) y `ccdd spec` coinciden con el código.
+
 Spec: `ccdd_spec_v0.3.md` (superset compatible de v0.2/v0.1). Resumen normativo en su §8.
 **Reorienta el debilitamiento de políticas por reescritura** (antes planeado como check
 advisory con LLM dentro del gate) hacia atestación humana firmada, fuera del gate.

@@ -145,7 +145,7 @@ verificación adversaria. Construirlo produjo, una y otra vez, la misma forma:
 > lo que parecía completo tenía un agujero, y solo *atacarlo* (no extenderlo) lo encontró —
 > a veces el agujero estaba en el código, a veces en la gramática, una vez en mi propio prompt.
 
-El núcleo determinista (gate de 9 reglas, 39 tests, sin LLM) es lo que permite que todo esto sea
+El núcleo determinista (gate de 9 reglas, sin LLM) es lo que permite que todo esto sea
 **verificable**: cada hallazgo se convirtió en un test que lo fija. La pieza heurística (el
 advisory LLM) vive afuera, etiquetada como falible. Esa separación no es un detalle de
 implementación: es la tesis.
