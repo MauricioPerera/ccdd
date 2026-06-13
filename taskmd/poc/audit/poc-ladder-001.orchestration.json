@@ -1,0 +1,39 @@
+{
+  "id": "poc-ladder-001",
+  "objetivo": "Iniciar sesión en the-internet.herokuapp.com con las credenciales de prueba",
+  "executor": "mock",
+  "ladder": [
+    "kimi-cheap:cloud",
+    "kimi-capable:cloud"
+  ],
+  "attempts": [
+    {
+      "rung": 1,
+      "model": "kimi-cheap:cloud",
+      "attempt": 1,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "feedback": "El objetivo aún NO se cumplió: \"Iniciar sesión en the-internet.herokuapp.com con las credenciales de prueba\".\nEstado actual observado:\n  - [\"https://the-internet.herokuapp.com/login\"]\n  - \"Login Page This is where you can log into the secure area. Enter tomsmith for the username and Super\"\nVuelve a intentar lograr el objetivo."
+    },
+    {
+      "rung": 1,
+      "model": "kimi-cheap:cloud",
+      "attempt": 2,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "note": "no-progreso"
+    },
+    {
+      "rung": 2,
+      "model": "kimi-capable:cloud",
+      "attempt": 1,
+      "engine_verdict": "PASS",
+      "ac_pass": true,
+      "dod_pass": true,
+      "feedback": null
+    }
+  ],
+  "verdict": "PASS"
+}

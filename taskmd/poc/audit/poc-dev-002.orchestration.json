@@ -1,0 +1,35 @@
+{
+  "id": "poc-dev-002",
+  "objetivo": "Implementar roundHalfEven(x) que redondea x al entero más cercano",
+  "executor": "pi",
+  "attempts": [
+    {
+      "attempt": 1,
+      "engine_verdict": "PASS",
+      "ac_pass": true,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test bankers.test.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.4383ms)\n✔ 1.5 -> 2 (0.0683ms)\n✔ 2.5 -> 2 (0.0556ms)\n✔ 3.5 -> 4 (0.0459ms)\n✔ -2.5 -> -2 (0.7632ms)\n✔ 2.4 -> 2 (0.0733ms)\n✔ 2.6 -> 3 (0.0676ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 67.2759"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.4945ms)\n✔ 1.5 -> 2 (0.0733ms)\n✔ 2.5 -> 2 (0.0548ms)\n✔ 3.5 -> 4 (0.0489ms)\n✔ -2.5 -> -2 (0.683ms)\n✔ 2.4 -> 2 (0.0592ms)\n✔ 2.6 -> 3 (0.0537ms)\n✔ sum 2 + 3 = 5 (0.4424ms)\n✔ sum -1 + 1 = 0 (0.0756ms)\n✔ sum 0 + 0 = 0 (0.0625ms)\n✔ sum 10 + 15 = 25 (0.0554ms)\nℹ tests 11\nℹ suites 0\nℹ pass 11\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 77.8646"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": null
+    }
+  ],
+  "verdict": "PASS"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "poc-dev-001",
+  "objetivo": "Implementar la función sum(a,b) para que devuelva la suma de a y b",
+  "executor": "pi",
+  "attempts": [
+    {
+      "attempt": 1,
+      "engine_verdict": "PASS",
+      "ac_pass": true,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ sum 2 + 3 = 5 (0.4068ms)\n✔ sum -1 + 1 = 0 (0.0789ms)\n✔ sum 0 + 0 = 0 (0.0693ms)\n✔ sum 10 + 15 = 25 (0.0501ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 69.3082"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ sum 2 + 3 = 5 (0.4342ms)\n✔ sum -1 + 1 = 0 (0.0695ms)\n✔ sum 0 + 0 = 0 (0.0559ms)\n✔ sum 10 + 15 = 25 (0.053ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 77.9716"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": null
+    }
+  ],
+  "verdict": "PASS"
+}

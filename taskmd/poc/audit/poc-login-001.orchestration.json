@@ -1,0 +1,82 @@
+{
+  "id": "poc-login-001",
+  "objetivo": "Iniciar sesión en the-internet.herokuapp.com con las credenciales de prueba",
+  "executor": "mock",
+  "attempts": [
+    {
+      "attempt": 1,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "la URL es https://the-internet.herokuapp.com/secure",
+          "pass": false,
+          "observed": [
+            "https://the-internet.herokuapp.com/login"
+          ]
+        },
+        {
+          "kind": "AC",
+          "step": "el DOM muestra 'You logged into a secure area!'",
+          "pass": false,
+          "observed": "Login Page This is where you can log into the secure area. Enter tomsmith for the username and Super"
+        },
+        {
+          "kind": "DoD",
+          "step": "la página no muestra un estado de error",
+          "pass": true,
+          "observed": "sin marcadores de error"
+        },
+        {
+          "kind": "DoD",
+          "step": "la URL final usa https",
+          "pass": true,
+          "observed": [
+            "https://the-internet.herokuapp.com/login"
+          ]
+        }
+      ],
+      "feedback": "El objetivo aún NO se cumplió: \"Iniciar sesión en the-internet.herokuapp.com con las credenciales de prueba\".\nEstado actual observado:\n  - [\"https://the-internet.herokuapp.com/login\"]\n  - \"Login Page This is where you can log into the secure area. Enter tomsmith for the username and Super\"\nVuelve a intentar lograr el objetivo."
+    },
+    {
+      "attempt": 2,
+      "engine_verdict": "PASS",
+      "ac_pass": true,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "la URL es https://the-internet.herokuapp.com/secure",
+          "pass": true,
+          "observed": [
+            "https://the-internet.herokuapp.com/secure"
+          ]
+        },
+        {
+          "kind": "AC",
+          "step": "el DOM muestra 'You logged into a secure area!'",
+          "pass": true,
+          "observed": "…You logged into a secure area!…"
+        },
+        {
+          "kind": "DoD",
+          "step": "la página no muestra un estado de error",
+          "pass": true,
+          "observed": "sin marcadores de error"
+        },
+        {
+          "kind": "DoD",
+          "step": "la URL final usa https",
+          "pass": true,
+          "observed": [
+            "https://the-internet.herokuapp.com/secure"
+          ]
+        }
+      ],
+      "feedback": null
+    }
+  ],
+  "verdict": "PASS"
+}

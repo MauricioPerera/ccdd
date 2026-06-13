@@ -1,0 +1,20 @@
+{
+  "verdict": "PASS",
+  "technical_done": true,
+  "gates": [
+    {
+      "id": "url",
+      "expected": "página en the-internet.herokuapp.com/secure",
+      "observed": [
+        "https://the-internet.herokuapp.com/secure"
+      ],
+      "pass": true
+    },
+    {
+      "id": "flash",
+      "expected": "contiene \"You logged into a secure area!\"",
+      "observed": "You logged into a secure area! ×",
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "id": "poc-dev-003",
+  "objetivo": "Implementar secretCode(name) para que cumpla su especificación (definida en los tests)",
+  "executor": "pi",
+  "attempts": [
+    {
+      "attempt": 1,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test ../_holdout/secret.test.mjs' tiene éxito",
+          "pass": false,
+          "observed": "code=1\nAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 42,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:8:1\n✖ bravo -> 7 (0.1453ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 7\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 7,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:9:1\n✖ charlie -> 99 (0.1132ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 99\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 99,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.4455ms)\n✔ 1.5 -> 2 (0.0682ms)\n✔ 2.5 -> 2 (0.0536ms)\n✔ 3.5 -> 4 (0.045ms)\n✔ -2.5 -> -2 (0.6601ms)\n✔ 2.4 -> 2 (0.075ms)\n✔ 2.6 -> 3 (0.0624ms)\n✔ sum 2 + 3 = 5 (0.4197ms)\n✔ sum -1 + 1 = 0 (0.0825ms)\n✔ sum 0 + 0 = 0 (0.0741ms)\n✔ sum 10 + 15 = 25 (0.0524ms)\nℹ tests 11\nℹ suites 0\nℹ pass 11\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 75.8865"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": "El objetivo aún NO se cumplió: \"Implementar secretCode(name) para que cumpla su especificación (definida en los tests)\".\nEstado actual observado:\n  - \"code=1\\nAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.start (node:internal/test_runner/test:1096:17)\\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 42,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:8:1\\n✖ bravo -> 7 (0.1453ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 7\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 7,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:9:1\\n✖ charlie -> 99 (0.1132ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 99\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 99,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\"\nVuelve a intentar lograr el objetivo."
+    },
+    {
+      "attempt": 2,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test ../_holdout/secret.test.mjs' tiene éxito",
+          "pass": false,
+          "observed": "code=1\nAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 42,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:8:1\n✖ bravo -> 7 (0.1127ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 7\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 7,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:9:1\n✖ charlie -> 99 (0.1154ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 99\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 99,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.9756ms)\n✔ 1.5 -> 2 (0.2721ms)\n✔ 2.5 -> 2 (0.1728ms)\n✔ 3.5 -> 4 (0.1521ms)\n✔ -2.5 -> -2 (1.3604ms)\n✔ 2.4 -> 2 (0.1666ms)\n✔ 2.6 -> 3 (0.1714ms)\n✔ sum 2 + 3 = 5 (0.443ms)\n✔ sum -1 + 1 = 0 (0.0675ms)\n✔ sum 0 + 0 = 0 (0.1004ms)\n✔ sum 10 + 15 = 25 (0.0576ms)\nℹ tests 11\nℹ suites 0\nℹ pass 11\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 79.6941"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": "El objetivo aún NO se cumplió: \"Implementar secretCode(name) para que cumpla su especificación (definida en los tests)\".\nEstado actual observado:\n  - \"code=1\\nAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.start (node:internal/test_runner/test:1096:17)\\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 42,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:8:1\\n✖ bravo -> 7 (0.1127ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 7\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 7,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:9:1\\n✖ charlie -> 99 (0.1154ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 99\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 99,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\"\nVuelve a intentar lograr el objetivo."
+    },
+    {
+      "attempt": 3,
+      "engine_verdict": "FAIL",
+      "ac_pass": false,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test ../_holdout/secret.test.mjs' tiene éxito",
+          "pass": false,
+          "observed": "code=1\nAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 42,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:8:1\n✖ bravo -> 7 (0.1159ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 7\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 7,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at ..\\_holdout\\secret.test.mjs:9:1\n✖ charlie -> 99 (0.0963ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 99\n  \n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 99,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.4507ms)\n✔ 1.5 -> 2 (0.0697ms)\n✔ 2.5 -> 2 (0.0515ms)\n✔ 3.5 -> 4 (0.0451ms)\n✔ -2.5 -> -2 (0.7847ms)\n✔ 2.4 -> 2 (0.0651ms)\n✔ 2.6 -> 3 (0.0595ms)\n✔ sum 2 + 3 = 5 (0.4204ms)\n✔ sum -1 + 1 = 0 (0.0656ms)\n✔ sum 0 + 0 = 0 (0.0573ms)\n✔ sum 10 + 15 = 25 (0.0486ms)\nℹ tests 11\nℹ suites 0\nℹ pass 11\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 76.3057"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": "El objetivo aún NO se cumplió: \"Implementar secretCode(name) para que cumpla su especificación (definida en los tests)\".\nEstado actual observado:\n  - \"code=1\\nAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.start (node:internal/test_runner/test:1096:17)\\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 42,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:8:1\\n✖ bravo -> 7 (0.1159ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 7\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:8:33)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 7,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\\n\\ntest at ..\\\\_holdout\\\\secret.test.mjs:9:1\\n✖ charlie -> 99 (0.0963ms)\\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n  \\n  0 !== 99\\n  \\n      at TestContext.<anonymous> (file:///C:/Users/Administrador/.pi/task-contract/poc/_holdout/secret.test.mjs:9:36)\\n      at Test.runInAsyncScope (node:async_hooks:227:14)\\n      at Test.run (node:internal/test_runner/test:1201:25)\\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\\n      at Test.postRun (node:internal/test_runner/test:1330:19)\\n      at Test.run (node:internal/test_runner/test:1258:12)\\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\\n    generatedMessage: true,\\n    code: 'ERR_ASSERTION',\\n    actual: 0,\\n    expected: 99,\\n    operator: 'strictEqual',\\n    diff: 'simple'\\n  }\"\nVuelve a intentar lograr el objetivo."
+    },
+    {
+      "attempt": 4,
+      "engine_verdict": "PASS",
+      "ac_pass": true,
+      "dod_pass": true,
+      "gates": [
+        {
+          "kind": "AC",
+          "step": "el comando 'node --test ../_holdout/secret.test.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ alpha -> 42 (0.4106ms)\n✔ bravo -> 7 (0.0727ms)\n✔ charlie -> 99 (0.0514ms)\nℹ tests 3\nℹ suites 0\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 70.8201"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node --test' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n✔ 0.5 -> 0 (0.4473ms)\n✔ 1.5 -> 2 (0.068ms)\n✔ 2.5 -> 2 (0.0509ms)\n✔ 3.5 -> 4 (0.0465ms)\n✔ -2.5 -> -2 (0.6157ms)\n✔ 2.4 -> 2 (0.0654ms)\n✔ 2.6 -> 3 (0.0566ms)\n✔ sum 2 + 3 = 5 (0.511ms)\n✔ sum -1 + 1 = 0 (0.0776ms)\n✔ sum 0 + 0 = 0 (0.0663ms)\n✔ sum 10 + 15 = 25 (0.058ms)\nℹ tests 11\nℹ suites 0\nℹ pass 11\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 91.6832"
+        },
+        {
+          "kind": "DoD",
+          "step": "el comando 'node check-no-todo.mjs' tiene éxito",
+          "pass": true,
+          "observed": "code=0\n"
+        }
+      ],
+      "feedback": null
+    }
+  ],
+  "verdict": "PASS"
+}
