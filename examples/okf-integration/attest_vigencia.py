@@ -29,17 +29,36 @@ def main() -> int:
     ap.add_argument("--note", default="")
     args = ap.parse_args()
 
-    root = pathlib.Path(args.bundle)
-    target = root / args.concept
+    root = pathlib.Path(args.bundle).resolve()
+    target = (root / args.concept).resolve()
+    # Path traversal: el concepto debe quedar dentro del bundle.
+    try:
+        target.relative_to(root)
+    except ValueError:
+        print(f"ERROR: '{args.concept}' debe estar dentro del bundle.")
+        return 1
     if not target.exists():
         print(f"ERROR: no existe {args.concept}")
         return 1
-    datetime.date.fromisoformat(args.on)
-    datetime.date.fromisoformat(args.until)
+    try:
+        datetime.date.fromisoformat(args.on)
+        datetime.date.fromisoformat(args.until)
+    except ValueError:
+        print("ERROR: --on y --until deben tener formato ISO (YYYY-MM-DD).")
+        return 1
 
     store = root / "attestations.json"
-    data = (json.loads(store.read_text(encoding="utf-8"))
-            if store.exists() else {"vigencia_version": "0.1", "attestations": []})
+    if store.exists():
+        try:
+            data = json.loads(store.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            print(f"ERROR: {store.name} no contiene un JSON válido.")
+            return 1
+        if not isinstance(data, dict) or not isinstance(data.get("attestations"), list):
+            print(f"ERROR: {store.name} no tiene la estructura esperada.")
+            return 1
+    else:
+        data = {"vigencia_version": "0.1", "attestations": []}
 
     entry = {
         "concept": args.concept,
@@ -52,7 +71,7 @@ def main() -> int:
     }
     # reemplaza atestacion previa del mismo concepto
     data["attestations"] = [a for a in data["attestations"]
-                            if a["concept"] != args.concept] + [entry]
+                            if not (isinstance(a, dict) and a.get("concept") == args.concept)] + [entry]
     store.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n",
                      encoding="utf-8")
     print(f"ATESTADO: {args.concept} vigente por {args.by} hasta {args.until} "
