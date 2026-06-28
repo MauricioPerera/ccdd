@@ -1,0 +1,15 @@
+{
+  "vigencia_version": "0.1",
+  "_comment": "Atestaciones de VIGENCIA SEMANTICA. Un humano afirma 'este contenido sigue siendo verdad'. Liga a content_sha (se anula si el contenido cambia) y caduca en valid_until (reafirmable sin tocar contenido). No automatiza el juicio de verdad; lo registra, firma y caduca.",
+  "attestations": [
+    {
+      "concept": "policies/refunds.md",
+      "content_sha256": "dbb1af85d080e5e27587e5c64dcd0b94b2bd90acf9ff6cad4a705e43a0d7c6f1",
+      "statement": "vigente",
+      "attested_by": "human:mauricio",
+      "attested_at": "2026-06-28",
+      "valid_until": "2027-06-28",
+      "note": "Revisada manualmente: la ventana de 30 dias sigue reflejando la politica comercial vigente."
+    }
+  ]
+}

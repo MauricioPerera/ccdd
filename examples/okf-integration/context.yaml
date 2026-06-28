@@ -1,0 +1,44 @@
+ccdd_version: "0.3"
+contract:
+  name: support-kb
+  budget:
+    model: claude-sonnet-4-6
+    max_tokens: 16000
+    reserve_output: 2000
+  slots:
+    # Slot estatico firmado: apunta DIRECTO al concepto OKF critico.
+    # El mismo archivo es concepto OKF conforme y slot CCDD gobernado.
+    - id: system_policies
+      priority: 0            # menor numero = se retiene primero
+      source:
+        type: static
+        path: policies/refunds.md
+        sign: true           # SHA-256 persistido en expected-hashes.json
+      compaction: none       # critico: nunca se trunca ni resume
+      min_tokens: 150        # piso duro; si cae por debajo, assemble aborta
+      review_quorum: 2       # cambiar su contenido exige 2 firmas (gate R6)
+    # Slot dinamico: el resto del bundle OKF entra por aca via retriever.
+    # Es la parte "blanda": se resume, se juzga, no se verifica.
+    - id: playbook_knowledge
+      priority: 10
+      source:
+        type: dynamic
+        provider: okf-retriever
+      compaction: summarize  # heuristico / no-determinista
+      max_tokens: 6000       # tope: el conocimiento no puede ahogar a las politicas
+    # Input del usuario.
+    - id: user_query
+      priority: 20
+      source:
+        type: runtime
+      compaction: truncate
+      max_tokens: 2000
+  guardrails:
+    - id: no-secrets
+      type: regex_deny
+      on_fail: abort
+      pattern: "(?i)(api[_-]?key|password|secret)\\s*[:=]"
+    - id: refund-claims-grounded
+      type: reference_check
+      on_fail: reroute
+      reroute_to: playbook_knowledge
