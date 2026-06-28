@@ -1,0 +1,21 @@
+# Capa 3 (sidecar): gobierno de VIGENCIA por edad.
+# NO es parte de OKF ni de CCDD. OKF deja timestamp opcional y no valida frescura;
+# CCDD firma contenido (anti-tamper) pero no recencia. Este archivo cubre esa grieta.
+# Limite honesto: gobierna EDAD (proxy), no VERDAD. Edad != vigencia semantica.
+freshness_version: "0.1"
+
+# TTL en dias por type OKF. Si un concepto supera su TTL -> stale.
+defaults:
+  Policy: 365          # politicas: revision anual
+  Playbook: 90         # playbooks operativos: trimestral
+  Documentation: 180   # docs: semestral
+
+# Override por ruta concreta (gana sobre el default por type).
+overrides:
+  policies/refunds.md: 365
+
+# warn = reporta y exit 0 (no bloquea CI); abort = exit 1 (bloquea).
+on_stale: warn
+
+# Concepto sin timestamp: las politicas/criticos lo exigen; el resto se avisa.
+require_timestamp_for_types: [Policy]
