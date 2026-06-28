@@ -1,5 +1,5 @@
 {
-  "vigencia_version": "0.1",
+  "vigencia_version": "0.2",
   "_comment": "Atestaciones de VIGENCIA SEMANTICA. Un humano afirma 'este contenido sigue siendo verdad'. Liga a content_sha (se anula si el contenido cambia) y caduca en valid_until (reafirmable sin tocar contenido). No automatiza el juicio de verdad; lo registra, firma y caduca.",
   "attestations": [
     {
@@ -9,6 +9,7 @@
       "attested_by": "human:mauricio",
       "attested_at": "2026-06-28",
       "valid_until": "2027-06-28",
+      "signature": "659c7e320d1aed11632dcd4fc87e40f69db9c069d5092458e95c4b26b5f6a1f719363493029ea431c3550ea5944853c643746bb7441b2e7d6675d6150a122c07",
       "note": "Revisada manualmente: la ventana de 30 dias sigue reflejando la politica comercial vigente."
     }
   ]

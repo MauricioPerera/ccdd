@@ -52,6 +52,38 @@ def load_attestations(root: pathlib.Path) -> dict:
         return {}
 
 
+def load_reviewers(root: pathlib.Path) -> dict:
+    f = root / "reviewers.json"
+    if not f.exists():
+        return {}
+    try:
+        data = json.loads(f.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"WARNING: no se pudo cargar {f.name}: {e}", file=sys.stderr)
+        return {}
+
+
+def verify_sig(pub_hex: str, msg: bytes, sig_hex: str) -> bool:
+    try:
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+        from cryptography.exceptions import InvalidSignature
+    except ImportError:
+        print("WARNING: 'cryptography' no instalado; no se pueden verificar firmas.",
+              file=sys.stderr)
+        return False
+    try:
+        Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_hex)).verify(
+            bytes.fromhex(sig_hex), msg)
+        return True
+    except (InvalidSignature, ValueError):
+        return False
+
+
+def vigencia_msg(concept: str, content_sha: str, on: str, until: str) -> bytes:
+    return f"vigencia:{concept}:{content_sha}:{on}:{until}".encode("utf-8")
+
+
 def parse_ts(value) -> datetime.date | None:
     if value is None:
         return None
@@ -106,6 +138,7 @@ def main() -> int:
     require_ts = set(pol.get("require_timestamp_for_types", []))
 
     attestations = load_attestations(root)
+    reviewers = load_reviewers(root)
 
     rows, stale, missing = [], 0, 0
     for f in sorted(root.rglob("*.md")):
@@ -118,10 +151,25 @@ def main() -> int:
         ctype = fm.get("type")
         ttl = overrides.get(rel, defaults.get(ctype))
 
-        # Señal autoritativa: una atestacion humana de vigencia supersede a la edad.
+        # Señal autoritativa: una atestacion humana de vigencia FIRMADA supersede a
+        # la edad. Solo se honra si la firma Ed25519 verifica contra un revisor
+        # registrado en reviewers.json (raiz de confianza).
         att = attestations.get(rel)
         if att is not None:
-            void = att.get("content_sha256") != sha256_file(f)
+            by = att.get("attested_by")
+            pub = reviewers.get(by) if by else None
+            signed_sha = att.get("content_sha256", "")
+            msg = vigencia_msg(rel, signed_sha, att.get("attested_at", ""),
+                               att.get("valid_until", ""))
+            sig_ok = isinstance(pub, str) and verify_sig(pub, msg, att.get("signature", ""))
+            if not sig_ok:
+                stale += 1
+                rows.append({"concept": rel, "type": ctype, "age_days": None,
+                             "ttl_days": ttl, "status": "INVALID-ATTEST",
+                             "by": by,
+                             "detail": "firma ausente/inválida o revisor no registrado"})
+                continue
+            void = signed_sha != sha256_file(f)
             valid_until = att.get("valid_until")
             if not valid_until:
                 expired = True
