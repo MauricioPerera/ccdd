@@ -59,12 +59,14 @@ que gobierna la frescura de los *datos*, no la del *conocimiento*.
 
 La POC la ataca en dos niveles: (1) un proxy determinista por **edad**
 (`freshness.yaml` + `check_freshness.py`), y (2) una **atestación humana de
-vigencia** (`attestations.json` + `attest_vigencia.py`) — un humano afirma "sigue
-siendo verdad", ligado al `content_sha` (se anula si el contenido cambia) y con
-caducidad (`valid_until`, reafirmable sin tocar contenido). La atestación
-supersede a la edad. Lo único que NO se automatiza —y es el punto— es el *juicio*
-de verdad: lo aporta el humano; la máquina lo registra, liga a contenido y
-caduca. Estados: VIGENT / EXPIRED-ATTEST / VOID-ATTEST / fallback por edad.
+vigencia firmada Ed25519** (`attestations.json` + `attest_vigencia.py`, verificada
+contra `reviewers.json`) — un humano afirma "sigue siendo verdad" y lo **firma**
+con su clave privada. La firma cubre `concepto:content_sha:attested_at:valid_until`,
+así que se anula si el contenido cambia O si se intenta extender la ventana sin
+re-firmar, y no puede forjarla quien no tenga la clave. La atestación supersede a
+la edad. Lo único que NO se automatiza —y es el punto— es el *juicio* de verdad:
+lo aporta el humano; la máquina lo liga, lo firma, lo verifica y lo caduca.
+Estados: VIGENT / EXPIRED-ATTEST / VOID-ATTEST / INVALID-ATTEST / fallback por edad.
 
 # Estado verificado de la POC
 

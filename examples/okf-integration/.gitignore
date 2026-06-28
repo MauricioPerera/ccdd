@@ -1,2 +1,4 @@
 # Output del assemble CCDD (se regenera; no es fuente)
 last-assembly.json
+# Claves privadas Ed25519 de revisores: NUNCA se versionan (solo la pública en reviewers.json)
+*.key
