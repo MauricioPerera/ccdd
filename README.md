@@ -220,7 +220,7 @@ falta de espacio — no sustituye la robustez del propio modelo.
 Detalle en [`ccdd_spec_v0.3.md` §7](ccdd_spec_v0.3.md): tokenizador real, caducidad/revocación de
 atestaciones, aislamiento estructural de slots `dynamic` (§6.5), y rotación de claves de revisor. La
 capa de rigor (firma, gobernanza, quórum) ya está implementada y probada en la referencia; el
-asistente LLM (`draft`, `review_assist`) está implementada y demostrada manualmente (fuera de la
+asistente LLM (`draft`, `review_assist`) está implementado y demostrado manualmente (fuera de la
 suite determinista, por ser no-determinista).
 
 ---
