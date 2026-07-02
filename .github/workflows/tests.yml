@@ -18,3 +18,47 @@ jobs:
       - name: Run reference test suite
         working-directory: ccdd_reference
         run: python run_tests.py        # invocación canónica única (ver run_tests.py); el meta-test deriva su conteo de la misma fuente
+
+  # Humo del POC de gobierno (examples/okf-integration): el CI del nucleo no
+  # regresiona el ejemplo, asi que un drift en hashes/firmas/freshness pasaria
+  # en verde. Este job cubre esa grieta sin tocar el ejemplo.
+  # --now fijado a 2026-06-28 (determinista, dentro de la ventana de la
+  # atestacion vigente; valid_until=2027-06-28). Solo se honra el upper-bound
+  # de vigencia (now > valid_until), asi que re-atestar renueva la ventana sin
+  # romper este test. Si la atestacion no se renueva antes del 2027-06-28, el
+  # step de freshness fallara (senal correcta: la atestacion caduco).
+  poc-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install pyyaml jsonschema cryptography
+      - name: ccdd lint del ejemplo
+        run: |
+          set -e
+          python ccdd_reference/ccdd.py lint examples/okf-integration
+      - name: ccdd assemble del ejemplo
+        run: |
+          set -e
+          printf '%s' '{"user_query":"cliente pide reembolso fuera de los 30 dias"}' > inputs.json
+          python ccdd_reference/ccdd.py assemble examples/okf-integration --inputs inputs.json
+      - name: check_freshness (firma Ed25519 + vigencia)
+        working-directory: examples/okf-integration
+        run: |
+          set -e
+          out="$(python check_freshness.py . --now 2026-06-28)"
+          echo "$out"
+          echo "$out" | grep -E '\[ *VIGENT\] policies/refunds\.md'
+          echo "$out" | grep -E 'stale=0[[:space:]]+missing_required_ts=0'
+      - name: sha256 policies/refunds.md == expected-hashes.json
+        working-directory: examples/okf-integration
+        run: |
+          set -e
+          python -c "import hashlib,json,sys; \
+          h=hashlib.sha256(open('policies/refunds.md','rb').read()).hexdigest(); \
+          e=json.load(open('expected-hashes.json'))['system_policies']; \
+          print('actual  =',h); print('expected=',e); \
+          sys.exit(0 if h==e else 1)"

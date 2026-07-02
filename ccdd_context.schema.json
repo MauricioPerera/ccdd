@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ccdd.dev/schemas/context-0.1.json",
+  "$id": "https://ccdd.dev/schemas/context-0.3.json",
   "title": "CCDD Context Contract",
-  "description": "Esquema formal del context.yaml — CCDD v0.1 (§3 de la especificación).",
+  "description": "Esquema formal del context.yaml — CCDD v0.3 (§3 de la especificación v0.3).",
   "type": "object",
   "required": ["ccdd_version", "contract"],
   "additionalProperties": false,
@@ -65,7 +65,7 @@
         "min_tokens": {
           "type": "integer",
           "minimum": 0,
-          "description": "Piso duro; si el slot cae por debajo, el assemble aborta."
+          "description": "Piso de retención; el piso efectivo es min(tamaño_real, min_tokens). Se aborta solo si la compactación fuerza al slot por debajo de ese piso; un contenido naturalmente más pequeño que min_tokens NO es un fallo."
         },
         "max_tokens": { "type": "integer", "exclusiveMinimum": 0 },
         "review_quorum": {
@@ -112,7 +112,7 @@
       "allOf": [
         {
           "if": { "properties": { "type": { "const": "static" } } },
-          "then": { "required": ["path"] }
+          "then": { "required": ["path", "sign"] }
         }
       ]
     },

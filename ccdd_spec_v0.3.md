@@ -241,7 +241,7 @@ Una implementación conforme **NO DEBE** afirmar que aborda:
 
 ### 6.5. Recomendaciones normativas
 
-- Una implementación **DEBE** tratar todo slot `dynamic` como no confiable y aislarlo estructuralmente de `system`/`policies`.
+- Una implementación **DEBERÍA** tratar todo slot `dynamic` como no confiable y aislarlo estructuralmente de `system`/`policies`.
 - Una implementación **NO DEBE** afirmar conformidad de seguridad si las reglas de su gate L2 no son deterministas o auditables.
 - Las claves privadas de revisor **NO DEBEN** versionarse; `reviewers.json` (públicas) y `attestations.json` (firmas) **SÍ**.
 - Un evento **génesis** de `reviewers.json` **DEBE** auditarse fuera de banda.
@@ -262,7 +262,7 @@ Abierto (v0.4):
 
 - [ ] Tokenizador real en lugar de la aproximación `chars/4`.
 - [ ] **Caducidad temporal / revocación explícita** de atestaciones (hoy solo caducan al cambiar el contenido).
-- [ ] Aislamiento estructural de slots `dynamic` (§6.5) ejecutado y verificado por la referencia.
+- [ ] Aislamiento estructural de slots `dynamic` (§6.5): implementarlo en la referencia y elevarlo a MUST del nivel que corresponda.
 - [ ] Rotación/revocación de claves de revisor con cadena de gobernanza.
 
 ---
