@@ -238,17 +238,6 @@
   .bcol.yes li::before{ content:"✓"; position:absolute; left:0; color:var(--verified); font-family:var(--mono); }
   .bcol.no li::before{ content:"—"; position:absolute; left:0; color:var(--blocked); font-family:var(--mono); }
 
-  .family{ display:grid; grid-template-columns:repeat(5,1fr); gap:.8rem; margin-top:2rem; }
-  @media (max-width: 900px){ .family{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width: 520px){ .family{ grid-template-columns:1fr; } }
-  .fam{
-    display:block; padding:1rem 1.1rem; background:var(--panel); border:1px solid var(--line);
-    border-radius:3px; text-decoration:none; color:var(--text); transition:transform .15s ease, border-color .15s ease;
-  }
-  .fam:hover{ transform:translateY(-2px); border-color:var(--teal); }
-  .fam.self{ border-color:var(--teal); border-left:3px solid var(--teal); }
-  .fam .t{ font-weight:700; font-size:.92rem; display:block; margin-bottom:.3rem; }
-  .fam .s{ font-size:.79rem; color:var(--text-dim); }
 
   .closing{ text-align:center; border-bottom:none; }
   .closing .col{ max-width:56ch; }
@@ -592,10 +581,6 @@
       "boundary.no1":"Stop an injection that legitimately fits inside the context — that's the model's own robustness",
       "boundary.no2":"Secure the agent's tool actions or side effects",
       "boundary.no3":"Vouch for the truth of external sources it assembles",
-      "family.tag":"06 · The family","family.h2":"One DNA, different planes",
-      "family.p":"A two-layer document (machine-verifiable + human-judgeable) plus deterministic validation, applied to a different plane in each sibling.",
-      "family.f1":"Context — this project","family.f2":"Static code (frozen oracle)","family.f3":"Dynamic task outcome",
-      "family.f4":"Knowledge-driven method","family.f5":"Visual identity (Google Labs)",
       "closing.h2":"Read the contract yourself",
       "closing.p":"MIT-licensed. Every claim on this page is checked into the repository that backs it.",
       "closing.cta1":"Open the repository","closing.cta2":"Read the spec"
@@ -645,10 +630,6 @@
       "boundary.no1":"Frenar una inyección que legítimamente cabe dentro del contexto — eso es robustez del propio modelo",
       "boundary.no2":"Asegurar las acciones de herramientas del agente ni sus efectos",
       "boundary.no3":"Dar fe de la veracidad de las fuentes externas que ensambla",
-      "family.tag":"06 · La familia","family.h2":"Un solo ADN, planos distintos",
-      "family.p":"Un documento de dos capas (verificable por máquina + juzgable por humano) más validación determinista, aplicado a un plano distinto en cada hermano.",
-      "family.f1":"Contexto — este proyecto","family.f2":"Código estático (oráculo congelado)","family.f3":"Outcome dinámico de tareas",
-      "family.f4":"Método knowledge-driven","family.f5":"Identidad visual (Google Labs)",
       "closing.h2":"Leé el contrato vos mismo",
       "closing.p":"Licencia MIT. Cada afirmación de esta página está commiteada en el repositorio que la respalda.",
       "closing.cta1":"Abrir el repositorio","closing.cta2":"Leer la spec"
@@ -698,10 +679,6 @@
       "boundary.no1":"Barrar uma injeção que legitimamente cabe dentro do contexto — isso é robustez do próprio modelo",
       "boundary.no2":"Proteger as ações de ferramentas do agente nem seus efeitos colaterais",
       "boundary.no3":"Atestar a veracidade das fontes externas que monta",
-      "family.tag":"06 · A família","family.h2":"Um só DNA, planos diferentes",
-      "family.p":"Um documento de duas camadas (verificável por máquina + julgável por humano) mais validação determinística, aplicado a um plano diferente em cada irmão.",
-      "family.f1":"Contexto — este projeto","family.f2":"Código estático (oráculo congelado)","family.f3":"Outcome dinâmico de tarefas",
-      "family.f4":"Método knowledge-driven","family.f5":"Identidade visual (Google Labs)",
       "closing.h2":"Leia o contrato você mesmo",
       "closing.p":"Licenciado sob MIT. Cada afirmação desta página está commitada no repositório que a sustenta.",
       "closing.cta1":"Abrir o repositório","closing.cta2":"Ler a spec"
