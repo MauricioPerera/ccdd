@@ -52,6 +52,16 @@ def sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def schema_errors(contract: dict) -> list[str]:
+    """Errores de esquema del contrato completo (documento con ccdd_version+contract).
+    Única fuente para lint/assemble/diff: evita que un comando corra sobre un
+    contrato que no conforma el schema y reviente con un KeyError crudo más abajo."""
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    return [f"[esquema] {'/'.join(map(str, e.path))}: {e.message}"
+            for e in sorted(Draft202012Validator(schema).iter_errors(contract),
+                            key=lambda e: e.path)]
+
+
 # ---- firma de atestaciones (Ed25519; import perezoso para no exigirlo en L1/L3) ----
 def _ed25519():
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -106,10 +116,7 @@ def cmd_lint(contract_dir: Path, sign: bool, as_json: bool = False) -> int:
     contract = load_contract(contract_dir)
 
     # 1. esquema
-    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-    for e in sorted(Draft202012Validator(schema).iter_errors(contract),
-                    key=lambda e: e.path):
-        errors.append(f"[esquema] {'/'.join(map(str, e.path))}: {e.message}")
+    errors.extend(schema_errors(contract))
 
     c = contract.get("contract", {})
     slots = c.get("slots", [])
@@ -356,12 +363,18 @@ def cmd_assemble(contract_dir: Path, inputs_path: Path) -> int:
     for g in c.get("guardrails", []):
         gid, gtype = g["id"], g["type"]
         ok, detail = True, "ok"
-        if gtype == "regex_deny":
+        if gtype == "regex_deny" and "pattern" not in g:
+            ok, detail = False, f"guardrail '{gid}' de tipo regex_deny sin pattern"
+        elif gtype == "regex_deny":
             blob = "\n".join(assembled.values())
             if re.search(g["pattern"], blob):
                 ok, detail = False, "patrón prohibido detectado"
         elif gtype == "reference_check":
             detail = "validado en lint"
+        elif gtype == "json_schema" and ("target_slot" not in g or "schema_path" not in g):
+            # fail-closed: el schema exige ambos campos, pero un contrato que
+            # llegó aquí sin pasar por `lint` podría no conformarlos.
+            ok, detail = False, f"guardrail '{gid}' de tipo json_schema sin target_slot/schema_path"
         elif gtype == "json_schema":
             target = g["target_slot"]
             try:
@@ -490,8 +503,19 @@ def cmd_diff(baseline_dir: Path, head_dir: Path, as_json: bool = False) -> int:
     El debilitamiento por reescritura (misma estructura, redacción más floja) sigue
     requiriendo un diff semántico con LLM (spec §5.2 / P3).
     """
-    base = load_contract(baseline_dir)["contract"]
-    head = load_contract(head_dir)["contract"]
+    base_doc = load_contract(baseline_dir)
+    head_doc = load_contract(head_dir)
+    schema_errs = [f"baseline: {e}" for e in schema_errors(base_doc)] \
+        + [f"head: {e}" for e in schema_errors(head_doc)]
+    if schema_errs:
+        msg = "DIFF: ABORTADO — contrato inválido:\n" + "\n".join(f"  - {e}" for e in schema_errs)
+        if as_json:
+            print(json.dumps({"ok": False, "errors": schema_errs}, indent=2, ensure_ascii=False))
+        else:
+            print(msg)
+        return 2
+    base = base_doc["contract"]
+    head = head_doc["contract"]
     regressions: list[str] = []   # bloquean el merge
     changes: list[str] = []       # informativos, no bloquean
 
