@@ -259,7 +259,35 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:.001s !important; transition-duration:.001s !important; }
   }
-</style>
+
+  /* family diagram */
+  #family{ --fa: var(--teal-strong-light); }
+  @media (prefers-color-scheme: dark){ #family{ --fa: var(--teal-strong-dark); } }
+  :root[data-theme="dark"] #family{ --fa: var(--teal-strong-dark); }
+  :root[data-theme="light"] #family{ --fa: var(--teal-strong-light); }
+  #family .fam2{ margin-top:2.2rem; display:flex; flex-direction:column; align-items:center; }
+  #family .fam2-core{ display:flex; align-items:center; gap:.9rem; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:.8rem 1.15rem; max-width:100%; }
+  #family .fam2-dna{ width:40px; height:40px; flex:0 0 auto; }
+  #family .fam2-core-txt{ display:flex; flex-direction:column; }
+  #family .fam2-core-t{ font-weight:700; font-size:.96rem; }
+  #family .fam2-core-s{ font-family:var(--mono); font-size:.71rem; color:var(--text-dim); margin-top:.12rem; }
+  #family .fam2-stem{ width:2px; height:28px; background:var(--line); }
+  #family .fam2-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.75rem; width:100%; }
+  #family .fam2-node{ display:block; text-decoration:none; color:inherit; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--line); border-radius:7px; padding:.9rem 1rem; transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+  #family .fam2-node:hover{ border-left-color:var(--fa); transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.10); }
+  #family .fam2-node:focus-visible{ outline:2px solid var(--fa); outline-offset:2px; }
+  #family .fam2-node.is-cousin{ border-style:dashed; }
+  #family .fam2-node.is-self{ border-color:var(--fa); }
+  #family .fam2-node-top{ display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; margin-bottom:.45rem; }
+  #family .fam2-name{ font-family:var(--mono); font-weight:700; font-size:.98rem; color:var(--fa); letter-spacing:-.01em; }
+  #family .fam2-plane{ font-family:var(--mono); font-size:.62rem; letter-spacing:.07em; text-transform:uppercase; color:var(--text-dim); border:1px solid var(--line); border-radius:3px; padding:.18em .5em; flex:0 0 auto; white-space:nowrap; }
+  #family .fam2-rel{ display:block; font-size:.85rem; line-height:1.5; color:var(--text-dim); }
+  #family .fam2-here{ display:inline-block; margin-top:.55rem; font-family:var(--mono); font-size:.6rem; letter-spacing:.07em; text-transform:uppercase; background:var(--fa); color:var(--bg); padding:.18em .55em; border-radius:3px; }
+  @media (max-width:520px){
+    #family .fam2-core{ flex-direction:column; text-align:center; gap:.55rem; }
+    #family .fam2-core-txt{ align-items:center; }
+  }
+  </style>
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to content</a>
@@ -439,25 +467,61 @@
 
     <section id="family">
       <div class="col-wide">
-        <span class="lvl-tag" data-i18n="family.tag">06 · The family</span>
-        <h2 data-i18n="family.h2">One DNA, different planes</h2>
-        <p data-i18n="family.p">A two-layer document (machine-verifiable + human-judgeable) plus deterministic validation, applied to a different plane in each sibling.</p>
-        <div class="family">
-          <a class="fam self" href="https://github.com/MauricioPerera/ccdd">
-            <span class="t">ccdd</span><span class="s" data-i18n="family.f1">Context — this project</span>
-          </a>
-          <a class="fam" href="https://github.com/MauricioPerera/ccdd-gate">
-            <span class="t">ccdd-gate</span><span class="s" data-i18n="family.f2">Static code (frozen oracle)</span>
-          </a>
-          <a class="fam" href="https://github.com/MauricioPerera/taskmd">
-            <span class="t">taskmd</span><span class="s" data-i18n="family.f3">Dynamic task outcome</span>
-          </a>
-          <a class="fam" href="https://github.com/MauricioPerera/KDD">
-            <span class="t">KDD</span><span class="s" data-i18n="family.f4">Knowledge-driven method</span>
-          </a>
-          <a class="fam" href="https://github.com/google-labs-code/design.md">
-            <span class="t">design.md</span><span class="s" data-i18n="family.f5">Visual identity (Google Labs)</span>
-          </a>
+        <span class="lvl-tag" data-i18n="fam2.tag">06 · The family</span>
+        <h2 data-i18n="fam2.h2">One DNA, five planes</h2>
+        <p data-i18n="fam2.p">Same DNA across the family — verifiable layer, judgeable layer, deterministic validation — each on a different plane; I am the notarized context that grounds everything.</p>
+        <div class="fam2">
+          <div class="fam2-core">
+            <svg class="fam2-dna" viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false">
+              <rect x="9" y="13" width="46" height="15" rx="3.5" fill="var(--fa)" fill-opacity="0.16" stroke="var(--fa)" stroke-width="1.6"/>
+              <rect x="9" y="35" width="46" height="15" rx="3.5" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-dasharray="3.5 3"/>
+              <circle cx="49" cy="49" r="9.5" fill="var(--fa)"/>
+              <path d="M44.5 49.2 l3 3 l6 -7" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <span class="fam2-core-txt">
+              <span class="fam2-core-t" data-i18n="fam2.core">The shared contract</span>
+              <span class="fam2-core-s" data-i18n="fam2.coresub">2-layer doc · deterministic check</span>
+            </span>
+          </div>
+          <div class="fam2-stem" aria-hidden="true"></div>
+          <div class="fam2-grid">
+            <a class="fam2-node is-self" href="https://github.com/MauricioPerera/ccdd">
+              <span class="fam2-node-top">
+                <span class="fam2-name">ccdd</span>
+                <span class="fam2-plane" data-i18n="fam2.plane.ccdd">Context</span>
+              </span>
+              <span class="fam2-rel" data-i18n="fam2.rel.ccdd">You are here: the versioned, notarized context — the family's base.</span>
+              <span class="fam2-here" data-i18n="fam2.here">you are here</span>
+            </a>
+            <a class="fam2-node" href="https://github.com/MauricioPerera/ccdd-gate">
+              <span class="fam2-node-top">
+                <span class="fam2-name">ccdd-gate</span>
+                <span class="fam2-plane" data-i18n="fam2.plane.gate">Static code</span>
+              </span>
+              <span class="fam2-rel" data-i18n="fam2.rel.gate">My static oracle: freezes the code I hand it as a contract.</span>
+            </a>
+            <a class="fam2-node" href="https://github.com/MauricioPerera/taskmd">
+              <span class="fam2-node-top">
+                <span class="fam2-name">taskmd</span>
+                <span class="fam2-plane" data-i18n="fam2.plane.taskmd">Live outcome</span>
+              </span>
+              <span class="fam2-rel" data-i18n="fam2.rel.taskmd">The dynamic twin: verifies completion against the live system.</span>
+            </a>
+            <a class="fam2-node" href="https://github.com/MauricioPerera/KDD">
+              <span class="fam2-node-top">
+                <span class="fam2-name">KDD</span>
+                <span class="fam2-plane" data-i18n="fam2.plane.kdd">Method</span>
+              </span>
+              <span class="fam2-rel" data-i18n="fam2.rel.kdd">The methodology that turns me from context into a contract.</span>
+            </a>
+            <a class="fam2-node is-cousin" href="https://github.com/google-labs-code/design.md">
+              <span class="fam2-node-top">
+                <span class="fam2-name">design.md</span>
+                <span class="fam2-plane" data-i18n="fam2.plane.design">Visual</span>
+              </span>
+              <span class="fam2-rel" data-i18n="fam2.rel.design">Our cousin: shares the DNA, owns the visual identity.</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -484,6 +548,7 @@
 
   var I18N = {
     en: {
+      "fam2.tag":"06 · The family","fam2.h2":"One DNA, five planes","fam2.p":"Same DNA across the family — verifiable layer, judgeable layer, deterministic validation — each on a different plane; I am the notarized context that grounds everything.","fam2.core":"The shared contract","fam2.coresub":"2-layer doc · deterministic check","fam2.here":"you are here","fam2.plane.ccdd":"Context","fam2.plane.gate":"Static code","fam2.plane.taskmd":"Live outcome","fam2.plane.kdd":"Method","fam2.plane.design":"Visual","fam2.rel.ccdd":"You are here: the versioned, notarized context — the family's base.","fam2.rel.gate":"My static oracle: freezes the code I hand it as a contract.","fam2.rel.taskmd":"The dynamic twin: verifies completion against the live system.","fam2.rel.kdd":"The methodology that turns me from context into a contract.","fam2.rel.design":"Our cousin: shares the DNA, owns the visual identity.",
       "a11y.skip":"Skip to content",
       "nav.a":"The problem","nav.b":"The hybrid contract","nav.c":"Three levels","nav.d":"The regression gate",
       "nav.e":"By the numbers","nav.f":"The boundary","nav.g":"The family",
@@ -536,6 +601,7 @@
       "closing.cta1":"Open the repository","closing.cta2":"Read the spec"
     },
     es: {
+      "fam2.tag":"06 · La familia","fam2.h2":"Un ADN, cinco planos","fam2.p":"Mismo ADN en la familia — capa verificable, capa juzgable, validación determinista — cada uno en un plano distinto; yo soy el contexto notariado que fundamenta todo.","fam2.core":"El contrato compartido","fam2.coresub":"Doc de 2 capas · chequeo determinista","fam2.here":"estás aquí","fam2.plane.ccdd":"Contexto","fam2.plane.gate":"Código estático","fam2.plane.taskmd":"Resultado en vivo","fam2.plane.kdd":"Método","fam2.plane.design":"Visual","fam2.rel.ccdd":"Estás aquí: el contexto versionado y notariado, la base de la familia.","fam2.rel.gate":"Mi oráculo estático: congela el código que le entrego como contrato.","fam2.rel.taskmd":"El gemelo dinámico: verifica la completitud contra el sistema vivo.","fam2.rel.kdd":"La metodología que me convierte de contexto en contrato.","fam2.rel.design":"Nuestro primo: comparte el ADN, tiene la identidad visual.",
       "a11y.skip":"Ir al contenido",
       "nav.a":"El problema","nav.b":"El contrato híbrido","nav.c":"Tres niveles","nav.d":"El gate de regresión",
       "nav.e":"En números","nav.f":"El límite","nav.g":"La familia",
@@ -588,6 +654,7 @@
       "closing.cta1":"Abrir el repositorio","closing.cta2":"Leer la spec"
     },
     pt: {
+      "fam2.tag":"06 · A família","fam2.h2":"Um DNA, cinco planos","fam2.p":"Mesmo DNA na família — camada verificável, camada julgável, validação determinística — cada um em um plano distinto; eu sou o contexto notarizado que fundamenta tudo.","fam2.core":"O contrato compartilhado","fam2.coresub":"Doc de 2 camadas · verificação determinista","fam2.here":"você está aqui","fam2.plane.ccdd":"Contexto","fam2.plane.gate":"Código estático","fam2.plane.taskmd":"Resultado ao vivo","fam2.plane.kdd":"Método","fam2.plane.design":"Visual","fam2.rel.ccdd":"Você está aqui: o contexto versionado e notarizado, a base da família.","fam2.rel.gate":"Meu oráculo estático: congela o código que lhe entrego como contrato.","fam2.rel.taskmd":"O gêmeo dinâmico: verifica a conclusão contra o sistema vivo.","fam2.rel.kdd":"A metodologia que me transforma de contexto em contrato.","fam2.rel.design":"Nosso primo: compartilha o DNA, tem a identidade visual.",
       "a11y.skip":"Pular para o conteúdo",
       "nav.a":"O problema","nav.b":"O contrato híbrido","nav.c":"Três níveis","nav.d":"O gate de regressão",
       "nav.e":"Em números","nav.f":"O limite","nav.g":"A família",
