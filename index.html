@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CCDD — The context, put under contract</title>
+<meta name="description" content="Your prompts and policies are loose, unversioned text. CCDD makes them a hybrid contract: a machine blocks context regressions, a human signs off on what only judgment can decide." />
+<style>
+  /* ============ TOKENS ============
+     Identity distinct from its siblings (KDD = sealed dossier/serif/gold;
+     ccdd-gate = instrument panel/mono/amber). Here: "the context, versioned
+     & notarized" — cool slate ground, a teal notary accent, sans display. */
+  :root{
+    --slate:          #161A22;
+    --slate-panel:    #1F2530;
+    --slate-line:     #333B48;
+    --slate-text:     #E7E9EC;
+    --slate-text-dim: #98A0AC;
+
+    --paper:          #EAECEF;
+    --paper-panel:    #DDE0E5;
+    --paper-line:     #C4C9D1;
+    --paper-text:     #171B22;
+    --paper-text-dim: #545C67;
+
+    --teal:           #159C9C;   /* brand notary accent */
+    --verified-bg:    rgba(37,150,120,.14);
+    --blocked-bg:     rgba(196,66,58,.14);
+
+    /* small-text colors need per-theme variants to clear 4.5:1 (AA) on both grounds */
+    --teal-strong-light:  #0C6E6E;
+    --teal-strong-dark:   #37B7B7;
+    --verified-light:     #1E7355;
+    --verified-dark:      #43A784;
+    --blocked-light:      #A2382E;
+    --blocked-dark:       #D46A5E;
+
+    --bg:       var(--paper);
+    --panel:    var(--paper-panel);
+    --line:     var(--paper-line);
+    --text:     var(--paper-text);
+    --text-dim: var(--paper-text-dim);
+    --teal-strong: var(--teal-strong-light);
+    --verified:    var(--verified-light);
+    --blocked:     var(--blocked-light);
+
+    --sans: "Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    --mono: "JetBrains Mono","Cascadia Code","SF Mono","IBM Plex Mono",Consolas,"Liberation Mono",monospace;
+
+    --measure: 66ch;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:var(--slate); --panel:var(--slate-panel); --line:var(--slate-line); --text:var(--slate-text); --text-dim:var(--slate-text-dim);
+      --teal-strong:var(--teal-strong-dark); --verified:var(--verified-dark); --blocked:var(--blocked-dark);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:var(--slate); --panel:var(--slate-panel); --line:var(--slate-line); --text:var(--slate-text); --text-dim:var(--slate-text-dim);
+    --teal-strong:var(--teal-strong-dark); --verified:var(--verified-dark); --blocked:var(--blocked-dark);
+  }
+  :root[data-theme="light"]{
+    --bg:var(--paper); --panel:var(--paper-panel); --line:var(--paper-line); --text:var(--paper-text); --text-dim:var(--paper-text-dim);
+    --teal-strong:var(--teal-strong-light); --verified:var(--verified-light); --blocked:var(--blocked-light);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    font-size:16.5px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--teal); color:#fff; }
+  a{ color:inherit; }
+  h1,h2,h3{ font-family:var(--sans); font-weight:700; text-wrap:balance; margin:0; letter-spacing:-.015em; }
+  code, .mono{ font-family:var(--mono); }
+  .skip-link{
+    position:absolute; left:-999px; top:0; background:var(--teal); color:#fff;
+    padding:.6em 1em; z-index:200; font-weight:600;
+  }
+  .skip-link:focus{ left:1rem; top:1rem; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--teal); outline-offset:3px; }
+
+  /* ============ NAV: mobile sticky bar + hamburger below 960px; sidebar at/above ============ */
+  .lang-toggle{
+    display:inline-flex; border:1px solid var(--line); border-radius:3px;
+    overflow:hidden; font-family:var(--mono); font-size:.72rem; flex:0 0 auto;
+  }
+  .lang-toggle button{
+    background:transparent; border:none; color:var(--text-dim); padding:.4em .7em; cursor:pointer;
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.03em;
+  }
+  .lang-toggle button[aria-pressed="true"]{ background:var(--teal); color:#fff; }
+
+  .mobile-bar{
+    position:sticky; top:0; z-index:50; background:var(--bg);
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:.85rem 1.25rem; border-bottom:1px solid var(--line);
+  }
+  .mobile-mark{ font-weight:700; font-size:1rem; letter-spacing:-.02em; }
+  .mobile-mark .dot{ color:var(--teal); }
+  .mobile-actions{ display:flex; align-items:center; gap:.8rem; }
+  .hamburger{
+    width:34px; height:34px; border:1px solid var(--line); border-radius:3px;
+    background:transparent; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:5px; cursor:pointer; flex:0 0 auto;
+  }
+  .hamburger .bar{ width:16px; height:2px; background:var(--text); transition:transform .25s ease, opacity .2s ease; }
+  .hamburger[aria-expanded="true"] .bar:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .hamburger[aria-expanded="true"] .bar:nth-child(2){ opacity:0; }
+  .hamburger[aria-expanded="true"] .bar:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+  .mobile-nav-panel{
+    position:sticky; top:57px; z-index:49; background:var(--panel);
+    border-bottom:1px solid var(--line); padding:.5rem 1.25rem 1rem;
+    display:flex; flex-direction:column;
+  }
+  .mobile-nav-panel[hidden]{ display:none; }
+  .mobile-nav-panel a{
+    display:flex; align-items:baseline; gap:.6em; padding:.75rem 0; color:var(--text);
+    text-decoration:none; border-bottom:1px solid var(--line); font-size:.95rem;
+  }
+  .mobile-nav-panel a:last-of-type{ border-bottom:none; }
+  .mobile-nav-panel .tag{ font-family:var(--mono); font-size:.76rem; color:var(--teal-strong); }
+
+  .shell{ display:block; }
+  .rail{ display:none; }
+  @media (min-width: 960px){
+    .mobile-bar, .mobile-nav-panel{ display:none; }
+    .shell{ display:grid; grid-template-columns:248px 1fr; }
+    .rail{
+      display:flex; flex-direction:column; gap:1.5rem; padding:2.2rem 1.4rem;
+      border-right:1px solid var(--line);
+      position:sticky; top:0; align-self:start; /* start, NOT stretch — stretch silently
+        breaks position:sticky on a grid item in real engines (confirmed empirically). */
+    }
+    .rail-mark{ font-weight:700; font-size:1.05rem; letter-spacing:-.02em; }
+    .rail-mark .dot{ color:var(--teal); }
+    .rail-index{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.6rem; }
+    .rail-index a{ display:flex; gap:.55rem; align-items:baseline; text-decoration:none; color:var(--text-dim); font-size:.85rem; }
+    .rail-index a:hover{ color:var(--teal-strong); }
+    .rail-index .tag{ font-family:var(--mono); font-size:.7rem; color:var(--teal); flex:0 0 auto; }
+    .rail .lang-toggle{ margin-top:auto; align-self:flex-start; }
+  }
+
+  /* ============ HERO ============ */
+  .hero{
+    background:
+      radial-gradient(1100px 560px at 14% -8%, rgba(21,156,156,.16), transparent 60%),
+      var(--slate);
+    color:var(--slate-text);
+    padding:5.5rem 2rem 4.5rem; border-bottom:1px solid var(--slate-line);
+  }
+  .hero-grid{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1.05fr .95fr; gap:3rem; align-items:center; }
+  @media (max-width: 980px){ .hero-grid{ grid-template-columns:1fr; } }
+  .eyebrow{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--teal); display:flex; align-items:center; gap:.6em; margin-bottom:1.1rem;
+  }
+  .eyebrow::before{ content:""; width:1.6em; height:1px; background:var(--teal); display:inline-block; }
+  .hero h1{ font-size:clamp(1.95rem, 3.7vw, 2.85rem); line-height:1.12; color:var(--slate-text); }
+  .hero h1 em{ font-style:normal; color:var(--teal); }
+  .hero p.lead{ color:var(--slate-text-dim); font-size:1.05rem; max-width:54ch; margin:1.25rem 0 2rem; }
+  .cta-row{ display:flex; gap:.9rem; flex-wrap:wrap; }
+  .btn{
+    font-weight:600; font-size:.92rem; padding:.75em 1.3em;
+    border-radius:3px; text-decoration:none; display:inline-flex; align-items:center; gap:.5em;
+    border:1px solid transparent; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn-primary{ background:var(--teal); color:#fff; }
+  .btn-primary:hover{ box-shadow:0 6px 20px rgba(21,156,156,.4); }
+  .btn-ghost{ border-color:var(--slate-line); color:var(--slate-text); }
+  .btn-ghost:hover{ border-color:var(--teal); }
+
+  .term{
+    background:#10141B; border:1px solid #2A323E; border-radius:6px; overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.55);
+  }
+  .term-bar{ display:flex; gap:.4em; padding:.65em .8em; background:#161C24; border-bottom:1px solid #2A323E; }
+  .term-bar span{ width:9px; height:9px; border-radius:50%; background:#333B48; }
+  .term-body{ padding:1.1em 1.2em 1.3em; font-family:var(--mono); font-size:.8rem; line-height:1.7; color:#D3D8DE; min-height:236px; }
+  .term-body .p{ color:#7B8792; }
+  .term-body .ok{ color:#54B08C; }
+  .term-body .bad{ color:#D97068; }
+  .term-body .seal{ color:#37C0C0; }
+  .term-body .comment{ color:#5C6773; }
+  .term-cursor::after{ content:"▍"; animation:blink 1s step-start infinite; color:#D3D8DE; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ============ SECTIONS ============ */
+  section{ padding:4.5rem 2rem; border-bottom:1px solid var(--line); }
+  .col{ max-width:var(--measure); margin:0 auto; }
+  .col-wide{ max-width:1100px; margin:0 auto; }
+  .lvl-tag{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; color:var(--teal-strong);
+    text-transform:uppercase; margin-bottom:.6rem; display:block;
+  }
+  section h2{ font-size:clamp(1.4rem, 2.4vw, 1.85rem); margin-bottom:1rem; }
+  section p{ color:var(--text-dim); max-width:62ch; }
+  section p + p{ margin-top:1em; }
+
+  .pillars{ display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2rem; }
+  @media (max-width: 700px){ .pillars{ grid-template-columns:1fr; } }
+  .pillar{ background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:1.6rem; }
+  .pillar .mark{ font-family:var(--mono); font-weight:700; font-size:.9rem; letter-spacing:.04em; color:var(--teal-strong); display:block; margin-bottom:.5rem; text-transform:uppercase; }
+  .pillar p{ color:var(--text-dim); font-size:.96rem; }
+
+  .flow{ display:flex; align-items:stretch; justify-content:space-between; gap:1rem; margin:2.5rem 0 1rem; }
+  @media (max-width: 820px){ .flow{ flex-direction:column; } }
+  .lvl{ flex:1; background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--teal); border-radius:4px; padding:1.4rem; opacity:.5; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
+  .lvl.on{ opacity:1; transform:translateY(0); }
+  .lvl .n{ font-family:var(--mono); font-size:.74rem; color:var(--teal-strong); letter-spacing:.06em; }
+  .lvl h3{ font-size:1.05rem; margin:.35rem 0 .5rem; }
+  .lvl p{ font-size:.88rem; color:var(--text-dim); max-width:none; }
+
+  .term-annotated{ display:grid; grid-template-columns:1.2fr .8fr; gap:2rem; margin-top:2rem; align-items:start; }
+  @media (max-width: 860px){ .term-annotated{ grid-template-columns:1fr; } }
+  .annot{ display:flex; flex-direction:column; gap:1.4rem; padding-top:.4rem; }
+  .annot .note{ font-size:.87rem; color:var(--text-dim); border-left:2px solid var(--teal); padding-left:.9rem; }
+  .annot .note b{ color:var(--text); }
+
+  .stats{ display:grid; grid-template-columns:repeat(5,1fr); gap:1.4rem; margin-top:2rem; }
+  @media (max-width: 900px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  .stat{ border-top:2px solid var(--teal); padding-top:.8rem; }
+  .stat .n{ font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.9rem; font-weight:700; color:var(--text); display:block; }
+  .stat .d{ font-size:.8rem; color:var(--text-dim); margin-top:.3rem; }
+
+  .boundary{ display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; margin-top:2rem; }
+  @media (max-width: 760px){ .boundary{ grid-template-columns:1fr; } }
+  .bcol{ padding:1.5rem; border-radius:4px; }
+  .bcol.yes{ background:var(--verified-bg); border:1px solid rgba(37,150,120,.35); }
+  .bcol.no{ background:var(--blocked-bg); border:1px solid rgba(196,66,58,.35); }
+  .bcol h3{ font-family:var(--mono); font-size:.78rem; letter-spacing:.05em; text-transform:uppercase; margin-bottom:1rem; }
+  .bcol.yes h3{ color:var(--verified); }
+  .bcol.no h3{ color:var(--blocked); }
+  .bcol ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:.8rem; }
+  .bcol li{ font-size:.92rem; color:var(--text); padding-left:1.1em; position:relative; }
+  .bcol.yes li::before{ content:"✓"; position:absolute; left:0; color:var(--verified); font-family:var(--mono); }
+  .bcol.no li::before{ content:"—"; position:absolute; left:0; color:var(--blocked); font-family:var(--mono); }
+
+  .family{ display:grid; grid-template-columns:repeat(5,1fr); gap:.8rem; margin-top:2rem; }
+  @media (max-width: 900px){ .family{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width: 520px){ .family{ grid-template-columns:1fr; } }
+  .fam{
+    display:block; padding:1rem 1.1rem; background:var(--panel); border:1px solid var(--line);
+    border-radius:3px; text-decoration:none; color:var(--text); transition:transform .15s ease, border-color .15s ease;
+  }
+  .fam:hover{ transform:translateY(-2px); border-color:var(--teal); }
+  .fam.self{ border-color:var(--teal); border-left:3px solid var(--teal); }
+  .fam .t{ font-weight:700; font-size:.92rem; display:block; margin-bottom:.3rem; }
+  .fam .s{ font-size:.79rem; color:var(--text-dim); }
+
+  .closing{ text-align:center; border-bottom:none; }
+  .closing .col{ max-width:56ch; }
+  .closing .cta-row{ justify-content:center; margin-top:1.6rem; }
+  .closing .btn-ghost{ border-color:var(--line); color:var(--text); }
+  .credit{ margin-top:3rem; font-size:.8rem; color:var(--text-dim); font-family:var(--mono); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001s !important; transition-duration:.001s !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to content</a>
+
+<div class="shell">
+  <header class="mobile-bar">
+    <div class="mobile-mark"><span class="dot">◈</span> CCDD</div>
+    <div class="mobile-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-set-lang="es" aria-pressed="false">ES</button>
+        <button type="button" data-set-lang="pt" aria-pressed="false">PT</button>
+      </div>
+      <button type="button" class="hamburger" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav-panel" aria-label="Menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+    </div>
+  </header>
+  <nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Index" hidden>
+    <a href="#problem"><span class="tag">00</span><span data-i18n="nav.a">The problem</span></a>
+    <a href="#contract"><span class="tag">01</span><span data-i18n="nav.b">The hybrid contract</span></a>
+    <a href="#levels"><span class="tag">02</span><span data-i18n="nav.c">Three levels</span></a>
+    <a href="#gate"><span class="tag">03</span><span data-i18n="nav.d">The regression gate</span></a>
+    <a href="#numbers"><span class="tag">04</span><span data-i18n="nav.e">By the numbers</span></a>
+    <a href="#boundary"><span class="tag">05</span><span data-i18n="nav.f">The boundary</span></a>
+    <a href="#family"><span class="tag">06</span><span data-i18n="nav.g">The family</span></a>
+  </nav>
+
+  <nav class="rail" aria-label="Index">
+    <div class="rail-mark"><span class="dot">◈</span> CCDD</div>
+    <ul class="rail-index">
+      <li><a href="#problem"><span class="tag">00</span><span data-i18n="nav.a">The problem</span></a></li>
+      <li><a href="#contract"><span class="tag">01</span><span data-i18n="nav.b">The hybrid contract</span></a></li>
+      <li><a href="#levels"><span class="tag">02</span><span data-i18n="nav.c">Three levels</span></a></li>
+      <li><a href="#gate"><span class="tag">03</span><span data-i18n="nav.d">The regression gate</span></a></li>
+      <li><a href="#numbers"><span class="tag">04</span><span data-i18n="nav.e">By the numbers</span></a></li>
+      <li><a href="#boundary"><span class="tag">05</span><span data-i18n="nav.f">The boundary</span></a></li>
+      <li><a href="#family"><span class="tag">06</span><span data-i18n="nav.g">The family</span></a></li>
+    </ul>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-set-lang="es" aria-pressed="false">ES</button>
+      <button type="button" data-set-lang="pt" aria-pressed="false">PT</button>
+    </div>
+  </nav>
+
+<main id="main">
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow" data-i18n="hero.eyebrow">Context Contract-Driven Development</span>
+          <h1 data-i18n-html="hero.h1">Your prompts and policies are loose text.<br>CCDD puts them <em>under contract</em>.</h1>
+          <p class="lead" data-i18n="hero.lead">Como TDD pone el test primero — CCDD pone el contrato de contexto primero. Lo verificable lo revisa una máquina; lo opinable, un humano.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/MauricioPerera/ccdd" data-i18n="hero.cta1">View on GitHub</a>
+            <a class="btn btn-ghost" href="https://github.com/MauricioPerera/ccdd#readme" data-i18n="hero.cta2">Read the README</a>
+          </div>
+        </div>
+        <div class="term" id="hero-term">
+          <div class="term-bar"><span></span><span></span><span></span></div>
+          <div class="term-body" id="hero-term-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="problem">
+      <div class="col">
+        <span class="lvl-tag" data-i18n="problem.tag">00 · The problem</span>
+        <h2 data-i18n="problem.h2">The context is the least-governed part of the stack</h2>
+        <p data-i18n="problem.p1">Your prompts, policies and guardrails live as loose, unversioned text scattered across files. Nothing stops a well-meaning edit from quietly demoting a safety policy, dropping a guardrail, or letting an untrusted source outrank a signed rule.</p>
+        <p data-i18n="problem.p2">CCDD turns that context into a <b>contract</b> — a versioned <code>context.yaml</code> with signatures, a CI gate that blocks context regressions, quorum governance for policy changes, and a reproducible audit. The verifiable half is checked by a machine; the judgment half stays a human's call.</p>
+      </div>
+    </section>
+
+    <section id="contract">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="contract.tag">01 · The hybrid contract</span>
+        <h2 data-i18n="contract.h2">Two layers, one document</h2>
+        <div class="pillars">
+          <div class="pillar">
+            <span class="mark" data-i18n="contract.vert">Verifiable → the gate</span>
+            <p data-i18n="contract.ver">Slots with priorities, mandatory floors, signed static content, declared guardrails. All of it machine-checkable: a script decides if a change weakened the context, deterministically, the same way every run.</p>
+          </div>
+          <div class="pillar">
+            <span class="mark" data-i18n="contract.judt">Judgeable → the human</span>
+            <p data-i18n="contract.jud">Whether a rewritten policy still "reads right", whether a change of tone is acceptable — that stays a person's call, recorded as a signed sign-off. The model informs; it does not decide.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="levels">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="levels.tag">02 · Three levels</span>
+        <h2 data-i18n="levels.h2">From contract to running context</h2>
+        <p data-i18n="levels.p" style="margin-bottom:0">Each level is a machine check; nothing ships on the model's word.</p>
+        <div class="flow" id="levels-flow">
+          <div class="lvl" data-i="0">
+            <div class="n">L1</div>
+            <h3 data-i18n="levels.l1t">Contract &amp; sign</h3>
+            <p data-i18n="levels.l1">Declare the context as data, lint it against the schema, and sign the static slots (Ed25519). Edit a signed slot and the seal breaks.</p>
+          </div>
+          <div class="lvl" data-i="1">
+            <div class="n">L2</div>
+            <h3 data-i18n="levels.l2t">Regression gate</h3>
+            <p data-i18n="levels.l2">On every change, nine deterministic rules (R1–R9) block the merge if the context posture degraded — with quorum governance for policy edits.</p>
+          </div>
+          <div class="lvl" data-i="2">
+            <div class="n">L3</div>
+            <h3 data-i18n="levels.l3t">Assemble &amp; audit</h3>
+            <p data-i18n="levels.l3">At runtime, assemble the payload by priority, run the guardrails, and emit a reproducible record — replayable byte-for-byte.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gate">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="gate.tag">03 · The regression gate</span>
+        <h2 data-i18n="gate.h2">A weakened context freezes the merge</h2>
+        <div class="term-annotated">
+          <div class="term" id="ann-term">
+            <div class="term-bar"><span></span><span></span><span></span></div>
+            <div class="term-body" id="ann-term-body"></div>
+          </div>
+          <div class="annot">
+            <div class="note"><b data-i18n="gate.n1t">The diff is read by a script.</b><br><span data-i18n="gate.n1">Not by an LLM. Nine rules compare the proposed contract against the baseline.</span></div>
+            <div class="note"><b data-i18n="gate.n2t">A demoted policy is a regression.</b><br><span data-i18n="gate.n2">Priority degraded, a lost signature, a deleted guardrail — each one blocks the merge (exit 1).</span></div>
+            <div class="note"><b data-i18n="gate.n3t">Only a signed change passes.</b><br><span data-i18n="gate.n3">A policy edit needs a quorum of registered reviewers' Ed25519 signatures before it's allowed through.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="numbers">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="numbers.tag">04 · By the numbers</span>
+        <h2 data-i18n="numbers.h2">By the numbers, as of this file</h2>
+        <p data-i18n="numbers.p">Spec v0.3 (Draft) with an executable reference implementation. Every figure is checked into the repository.</p>
+        <div class="stats">
+          <div class="stat"><span class="n">9</span><span class="d" data-i18n="numbers.s1">deterministic regression rules (R1–R9)</span></div>
+          <div class="stat"><span class="n">3</span><span class="d" data-i18n="numbers.s2">levels: contract, gate, assembly</span></div>
+          <div class="stat"><span class="n">51</span><span class="d" data-i18n="numbers.s3">tests green in the reference impl</span></div>
+          <div class="stat"><span class="n">0</span><span class="d" data-i18n="numbers.s4">LLM calls to reach a verdict</span></div>
+          <div class="stat"><span class="n">2</span><span class="d" data-i18n="numbers.s5">domains it was validated on</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="boundary">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="boundary.tag">05 · The boundary</span>
+        <h2 data-i18n="boundary.h2">What CCDD governs, what it doesn't</h2>
+        <p data-i18n="boundary.p">The honest scope is part of the method. CCDD controls context integrity — not full agent security.</p>
+        <div class="boundary">
+          <div class="bcol yes">
+            <h3 data-i18n="boundary.yesh">It governs</h3>
+            <ul>
+              <li data-i18n="boundary.yes1">That a safety policy can't be silently demoted, unsigned or dropped</li>
+              <li data-i18n="boundary.yes2">That a static slot's signed content hasn't changed without a re-sign</li>
+              <li data-i18n="boundary.yes3">That an untrusted dynamic source can't outrank a signed policy by priority</li>
+              <li data-i18n="boundary.yes4">That policy changes carry a quorum of reviewer signatures</li>
+            </ul>
+          </div>
+          <div class="bcol no">
+            <h3 data-i18n="boundary.noh">It does not</h3>
+            <ul>
+              <li data-i18n="boundary.no1">Stop an injection that legitimately fits inside the context — that's the model's own robustness</li>
+              <li data-i18n="boundary.no2">Secure the agent's tool actions or side effects</li>
+              <li data-i18n="boundary.no3">Vouch for the truth of external sources it assembles</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="family">
+      <div class="col-wide">
+        <span class="lvl-tag" data-i18n="family.tag">06 · The family</span>
+        <h2 data-i18n="family.h2">One DNA, different planes</h2>
+        <p data-i18n="family.p">A two-layer document (machine-verifiable + human-judgeable) plus deterministic validation, applied to a different plane in each sibling.</p>
+        <div class="family">
+          <a class="fam self" href="https://github.com/MauricioPerera/ccdd">
+            <span class="t">ccdd</span><span class="s" data-i18n="family.f1">Context — this project</span>
+          </a>
+          <a class="fam" href="https://github.com/MauricioPerera/ccdd-gate">
+            <span class="t">ccdd-gate</span><span class="s" data-i18n="family.f2">Static code (frozen oracle)</span>
+          </a>
+          <a class="fam" href="https://github.com/MauricioPerera/taskmd">
+            <span class="t">taskmd</span><span class="s" data-i18n="family.f3">Dynamic task outcome</span>
+          </a>
+          <a class="fam" href="https://github.com/MauricioPerera/KDD">
+            <span class="t">KDD</span><span class="s" data-i18n="family.f4">Knowledge-driven method</span>
+          </a>
+          <a class="fam" href="https://github.com/google-labs-code/design.md">
+            <span class="t">design.md</span><span class="s" data-i18n="family.f5">Visual identity (Google Labs)</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="col">
+        <h2 data-i18n="closing.h2">Read the contract yourself</h2>
+        <p data-i18n="closing.p">MIT-licensed. Every claim on this page is checked into the repository that backs it.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/MauricioPerera/ccdd" data-i18n="closing.cta1">Open the repository</a>
+          <a class="btn btn-ghost" href="https://github.com/MauricioPerera/ccdd/blob/main/ccdd_spec_v0.3.md" data-i18n="closing.cta2">Read the spec</a>
+        </div>
+        <div class="credit">— Mauricio Perera</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var I18N = {
+    en: {
+      "a11y.skip":"Skip to content",
+      "nav.a":"The problem","nav.b":"The hybrid contract","nav.c":"Three levels","nav.d":"The regression gate",
+      "nav.e":"By the numbers","nav.f":"The boundary","nav.g":"The family",
+      "hero.eyebrow":"Context Contract-Driven Development",
+      "hero.h1":"Your prompts and policies are loose text.<br>CCDD puts them <em>under contract</em>.",
+      "hero.lead":"As TDD puts the test first, CCDD puts the context contract first. The verifiable half is checked by a machine; the judgment half, by a human.",
+      "hero.cta1":"View on GitHub","hero.cta2":"Read the README",
+      "problem.tag":"00 · The problem","problem.h2":"The context is the least-governed part of the stack",
+      "problem.p1":"Your prompts, policies and guardrails live as loose, unversioned text scattered across files. Nothing stops a well-meaning edit from quietly demoting a safety policy, dropping a guardrail, or letting an untrusted source outrank a signed rule.",
+      "problem.p2":"CCDD turns that context into a <b>contract</b> — a versioned <code>context.yaml</code> with signatures, a CI gate that blocks context regressions, quorum governance for policy changes, and a reproducible audit. The verifiable half is checked by a machine; the judgment half stays a human's call.",
+      "contract.tag":"01 · The hybrid contract","contract.h2":"Two layers, one document",
+      "contract.vert":"Verifiable → the gate",
+      "contract.ver":"Slots with priorities, mandatory floors, signed static content, declared guardrails. All of it machine-checkable: a script decides if a change weakened the context, deterministically, the same way every run.",
+      "contract.judt":"Judgeable → the human",
+      "contract.jud":"Whether a rewritten policy still \"reads right\", whether a change of tone is acceptable — that stays a person's call, recorded as a signed sign-off. The model informs; it does not decide.",
+      "levels.tag":"02 · Three levels","levels.h2":"From contract to running context",
+      "levels.p":"Each level is a machine check; nothing ships on the model's word.",
+      "levels.l1t":"Contract & sign",
+      "levels.l1":"Declare the context as data, lint it against the schema, and sign the static slots (Ed25519). Edit a signed slot and the seal breaks.",
+      "levels.l2t":"Regression gate",
+      "levels.l2":"On every change, nine deterministic rules (R1–R9) block the merge if the context posture degraded — with quorum governance for policy edits.",
+      "levels.l3t":"Assemble & audit",
+      "levels.l3":"At runtime, assemble the payload by priority, run the guardrails, and emit a reproducible record — replayable byte-for-byte.",
+      "gate.tag":"03 · The regression gate","gate.h2":"A weakened context freezes the merge",
+      "gate.n1t":"The diff is read by a script.","gate.n1":"Not by an LLM. Nine rules compare the proposed contract against the baseline.",
+      "gate.n2t":"A demoted policy is a regression.","gate.n2":"Priority degraded, a lost signature, a deleted guardrail — each one blocks the merge (exit 1).",
+      "gate.n3t":"Only a signed change passes.","gate.n3":"A policy edit needs a quorum of registered reviewers' Ed25519 signatures before it's allowed through.",
+      "numbers.tag":"04 · By the numbers","numbers.h2":"By the numbers, as of this file",
+      "numbers.p":"Spec v0.3 (Draft) with an executable reference implementation. Every figure is checked into the repository.",
+      "numbers.s1":"deterministic regression rules (R1–R9)","numbers.s2":"levels: contract, gate, assembly",
+      "numbers.s3":"tests green in the reference impl","numbers.s4":"LLM calls to reach a verdict",
+      "numbers.s5":"domains it was validated on",
+      "boundary.tag":"05 · The boundary","boundary.h2":"What CCDD governs, what it doesn't",
+      "boundary.p":"The honest scope is part of the method. CCDD controls context integrity — not full agent security.",
+      "boundary.yesh":"It governs",
+      "boundary.yes1":"That a safety policy can't be silently demoted, unsigned or dropped",
+      "boundary.yes2":"That a static slot's signed content hasn't changed without a re-sign",
+      "boundary.yes3":"That an untrusted dynamic source can't outrank a signed policy by priority",
+      "boundary.yes4":"That policy changes carry a quorum of reviewer signatures",
+      "boundary.noh":"It does not",
+      "boundary.no1":"Stop an injection that legitimately fits inside the context — that's the model's own robustness",
+      "boundary.no2":"Secure the agent's tool actions or side effects",
+      "boundary.no3":"Vouch for the truth of external sources it assembles",
+      "family.tag":"06 · The family","family.h2":"One DNA, different planes",
+      "family.p":"A two-layer document (machine-verifiable + human-judgeable) plus deterministic validation, applied to a different plane in each sibling.",
+      "family.f1":"Context — this project","family.f2":"Static code (frozen oracle)","family.f3":"Dynamic task outcome",
+      "family.f4":"Knowledge-driven method","family.f5":"Visual identity (Google Labs)",
+      "closing.h2":"Read the contract yourself",
+      "closing.p":"MIT-licensed. Every claim on this page is checked into the repository that backs it.",
+      "closing.cta1":"Open the repository","closing.cta2":"Read the spec"
+    },
+    es: {
+      "a11y.skip":"Ir al contenido",
+      "nav.a":"El problema","nav.b":"El contrato híbrido","nav.c":"Tres niveles","nav.d":"El gate de regresión",
+      "nav.e":"En números","nav.f":"El límite","nav.g":"La familia",
+      "hero.eyebrow":"Context Contract-Driven Development",
+      "hero.h1":"Tus prompts y políticas son texto suelto.<br>CCDD los pone <em>bajo contrato</em>.",
+      "hero.lead":"Como TDD pone el test primero, CCDD pone el contrato de contexto primero. Lo verificable lo revisa una máquina; lo opinable, un humano.",
+      "hero.cta1":"Ver en GitHub","hero.cta2":"Leer el README",
+      "problem.tag":"00 · El problema","problem.h2":"El contexto es la parte menos gobernada del stack",
+      "problem.p1":"Tus prompts, políticas y guardrails viven como texto suelto sin versionar, desperdigado en archivos. Nada impide que una edición bienintencionada degrade en silencio una política de seguridad, elimine un guardrail, o deje que una fuente no confiable le gane en prioridad a una regla firmada.",
+      "problem.p2":"CCDD convierte ese contexto en un <b>contrato</b> — un <code>context.yaml</code> versionado con firmas, un gate de CI que bloquea las regresiones de contexto, gobernanza con quórum para cambios de política, y auditoría reproducible. La mitad verificable la revisa una máquina; la mitad de juicio sigue siendo de un humano.",
+      "contract.tag":"01 · El contrato híbrido","contract.h2":"Dos capas, un documento",
+      "contract.vert":"Verificable → el gate",
+      "contract.ver":"Slots con prioridades, pisos obligatorios, contenido estático firmado, guardrails declarados. Todo chequeable por máquina: un script decide si un cambio debilitó el contexto, de forma determinista, igual en cada corrida.",
+      "contract.judt":"Opinable → el humano",
+      "contract.jud":"Si una política reescrita \"se lee bien\", si un cambio de tono es aceptable — eso sigue siendo decisión de una persona, registrada como un sign-off firmado. El modelo informa; no decide.",
+      "levels.tag":"02 · Tres niveles","levels.h2":"Del contrato al contexto en vivo",
+      "levels.p":"Cada nivel es un chequeo de máquina; nada se shippea por la palabra del modelo.",
+      "levels.l1t":"Contrato y firma",
+      "levels.l1":"Declarar el contexto como dato, lintarlo contra el schema, y firmar los slots estáticos (Ed25519). Si editás un slot firmado, el sello se rompe.",
+      "levels.l2t":"Gate de regresión",
+      "levels.l2":"En cada cambio, nueve reglas deterministas (R1–R9) bloquean el merge si la postura de contexto se degradó — con gobernanza por quórum para editar políticas.",
+      "levels.l3t":"Ensamblar y auditar",
+      "levels.l3":"En runtime, ensamblar el payload por prioridad, correr los guardrails, y emitir un registro reproducible — replicable byte a byte.",
+      "gate.tag":"03 · El gate de regresión","gate.h2":"Un contexto debilitado congela el merge",
+      "gate.n1t":"El diff lo lee un script.","gate.n1":"No un LLM. Nueve reglas comparan el contrato propuesto contra la baseline.",
+      "gate.n2t":"Una política degradada es una regresión.","gate.n2":"Prioridad bajada, una firma perdida, un guardrail eliminado — cada una bloquea el merge (exit 1).",
+      "gate.n3t":"Solo pasa un cambio firmado.","gate.n3":"Editar una política exige el quórum de firmas Ed25519 de revisores registrados antes de dejarla pasar.",
+      "numbers.tag":"04 · En números","numbers.h2":"En números, a la fecha de este archivo",
+      "numbers.p":"Spec v0.3 (Draft) con implementación de referencia ejecutable. Cada cifra está commiteada en el repositorio.",
+      "numbers.s1":"reglas deterministas de regresión (R1–R9)","numbers.s2":"niveles: contrato, gate, ensamblado",
+      "numbers.s3":"tests en verde en la implementación de referencia","numbers.s4":"llamadas a un LLM para llegar a un veredicto",
+      "numbers.s5":"dominios en los que se validó",
+      "boundary.tag":"05 · El límite","boundary.h2":"Qué gobierna CCDD, qué no",
+      "boundary.p":"El alcance honesto es parte del método. CCDD controla la integridad del contexto — no la seguridad integral del agente.",
+      "boundary.yesh":"Gobierna",
+      "boundary.yes1":"Que una política de seguridad no pueda degradarse, quedar sin firma o eliminarse en silencio",
+      "boundary.yes2":"Que el contenido firmado de un slot estático no cambió sin re-firmar",
+      "boundary.yes3":"Que una fuente dinámica no confiable no le gane en prioridad a una política firmada",
+      "boundary.yes4":"Que los cambios de política lleven un quórum de firmas de revisores",
+      "boundary.noh":"No hace",
+      "boundary.no1":"Frenar una inyección que legítimamente cabe dentro del contexto — eso es robustez del propio modelo",
+      "boundary.no2":"Asegurar las acciones de herramientas del agente ni sus efectos",
+      "boundary.no3":"Dar fe de la veracidad de las fuentes externas que ensambla",
+      "family.tag":"06 · La familia","family.h2":"Un solo ADN, planos distintos",
+      "family.p":"Un documento de dos capas (verificable por máquina + juzgable por humano) más validación determinista, aplicado a un plano distinto en cada hermano.",
+      "family.f1":"Contexto — este proyecto","family.f2":"Código estático (oráculo congelado)","family.f3":"Outcome dinámico de tareas",
+      "family.f4":"Método knowledge-driven","family.f5":"Identidad visual (Google Labs)",
+      "closing.h2":"Leé el contrato vos mismo",
+      "closing.p":"Licencia MIT. Cada afirmación de esta página está commiteada en el repositorio que la respalda.",
+      "closing.cta1":"Abrir el repositorio","closing.cta2":"Leer la spec"
+    },
+    pt: {
+      "a11y.skip":"Pular para o conteúdo",
+      "nav.a":"O problema","nav.b":"O contrato híbrido","nav.c":"Três níveis","nav.d":"O gate de regressão",
+      "nav.e":"Em números","nav.f":"O limite","nav.g":"A família",
+      "hero.eyebrow":"Context Contract-Driven Development",
+      "hero.h1":"Seus prompts e políticas são texto solto.<br>O CCDD os coloca <em>sob contrato</em>.",
+      "hero.lead":"Assim como o TDD põe o teste primeiro, o CCDD põe o contrato de contexto primeiro. A metade verificável é checada por uma máquina; a de julgamento, por um humano.",
+      "hero.cta1":"Ver no GitHub","hero.cta2":"Ler o README",
+      "problem.tag":"00 · O problema","problem.h2":"O contexto é a parte menos governada da stack",
+      "problem.p1":"Seus prompts, políticas e guardrails vivem como texto solto e não versionado, espalhado por arquivos. Nada impede que uma edição bem-intencionada rebaixe em silêncio uma política de segurança, remova um guardrail, ou deixe uma fonte não confiável superar em prioridade uma regra assinada.",
+      "problem.p2":"O CCDD transforma esse contexto em um <b>contrato</b> — um <code>context.yaml</code> versionado com assinaturas, um gate de CI que bloqueia regressões de contexto, governança por quórum para mudanças de política, e auditoria reproduzível. A metade verificável é checada por uma máquina; a metade de julgamento continua sendo decisão de um humano.",
+      "contract.tag":"01 · O contrato híbrido","contract.h2":"Duas camadas, um documento",
+      "contract.vert":"Verificável → o gate",
+      "contract.ver":"Slots com prioridades, pisos obrigatórios, conteúdo estático assinado, guardrails declarados. Tudo checável por máquina: um script decide se uma mudança enfraqueceu o contexto, de forma determinística, igual em toda execução.",
+      "contract.judt":"Julgável → o humano",
+      "contract.jud":"Se uma política reescrita ainda \"lê bem\", se uma mudança de tom é aceitável — isso continua sendo decisão de uma pessoa, registrada como um sign-off assinado. O modelo informa; não decide.",
+      "levels.tag":"02 · Três níveis","levels.h2":"Do contrato ao contexto em execução",
+      "levels.p":"Cada nível é uma checagem de máquina; nada é publicado pela palavra do modelo.",
+      "levels.l1t":"Contrato e assinatura",
+      "levels.l1":"Declarar o contexto como dado, lintá-lo contra o schema, e assinar os slots estáticos (Ed25519). Edite um slot assinado e o selo quebra.",
+      "levels.l2t":"Gate de regressão",
+      "levels.l2":"A cada mudança, nove regras determinísticas (R1–R9) bloqueiam o merge se a postura de contexto piorou — com governança por quórum para editar políticas.",
+      "levels.l3t":"Montar e auditar",
+      "levels.l3":"Em runtime, montar o payload por prioridade, rodar os guardrails, e emitir um registro reproduzível — replicável byte a byte.",
+      "gate.tag":"03 · O gate de regressão","gate.h2":"Um contexto enfraquecido congela o merge",
+      "gate.n1t":"O diff é lido por um script.","gate.n1":"Não por um LLM. Nove regras comparam o contrato proposto com a baseline.",
+      "gate.n2t":"Uma política rebaixada é uma regressão.","gate.n2":"Prioridade rebaixada, uma assinatura perdida, um guardrail removido — cada uma bloqueia o merge (exit 1).",
+      "gate.n3t":"Só passa uma mudança assinada.","gate.n3":"Editar uma política exige o quórum de assinaturas Ed25519 de revisores registrados antes de deixá-la passar.",
+      "numbers.tag":"04 · Em números","numbers.h2":"Em números, na data deste arquivo",
+      "numbers.p":"Spec v0.3 (Draft) com implementação de referência executável. Cada número está commitado no repositório.",
+      "numbers.s1":"regras determinísticas de regressão (R1–R9)","numbers.s2":"níveis: contrato, gate, montagem",
+      "numbers.s3":"testes verdes na implementação de referência","numbers.s4":"chamadas a um LLM para chegar a um veredito",
+      "numbers.s5":"domínios em que foi validado",
+      "boundary.tag":"05 · O limite","boundary.h2":"O que o CCDD governa, o que não",
+      "boundary.p":"O escopo honesto faz parte do método. O CCDD controla a integridade do contexto — não a segurança integral do agente.",
+      "boundary.yesh":"Governa",
+      "boundary.yes1":"Que uma política de segurança não possa ser rebaixada, ficar sem assinatura ou removida em silêncio",
+      "boundary.yes2":"Que o conteúdo assinado de um slot estático não mudou sem re-assinar",
+      "boundary.yes3":"Que uma fonte dinâmica não confiável não supere em prioridade uma política assinada",
+      "boundary.yes4":"Que as mudanças de política carreguem um quórum de assinaturas de revisores",
+      "boundary.noh":"Não faz",
+      "boundary.no1":"Barrar uma injeção que legitimamente cabe dentro do contexto — isso é robustez do próprio modelo",
+      "boundary.no2":"Proteger as ações de ferramentas do agente nem seus efeitos colaterais",
+      "boundary.no3":"Atestar a veracidade das fontes externas que monta",
+      "family.tag":"06 · A família","family.h2":"Um só DNA, planos diferentes",
+      "family.p":"Um documento de duas camadas (verificável por máquina + julgável por humano) mais validação determinística, aplicado a um plano diferente em cada irmão.",
+      "family.f1":"Contexto — este projeto","family.f2":"Código estático (oráculo congelado)","family.f3":"Outcome dinâmico de tarefas",
+      "family.f4":"Método knowledge-driven","family.f5":"Identidade visual (Google Labs)",
+      "closing.h2":"Leia o contrato você mesmo",
+      "closing.p":"Licenciado sob MIT. Cada afirmação desta página está commitada no repositório que a sustenta.",
+      "closing.cta1":"Abrir o repositório","closing.cta2":"Ler a spec"
+    }
+  };
+
+  function applyLang(lang){
+    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("data-lang", lang);
+    var dict = I18N[lang] || I18N.en;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var k = el.getAttribute("data-i18n");
+      if (dict[k] !== undefined) el.textContent = dict[k];
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach(function(el){
+      var k = el.getAttribute("data-i18n-html");
+      if (dict[k] !== undefined) el.innerHTML = dict[k];
+    });
+    document.querySelectorAll(".lang-toggle button").forEach(function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-set-lang") === lang ? "true" : "false");
+    });
+    try{ localStorage.setItem("ccdd-lang", lang); }catch(e){}
+    buildTerminals(lang);
+  }
+  document.querySelectorAll(".lang-toggle button").forEach(function(b){
+    b.addEventListener("click", function(){ applyLang(b.getAttribute("data-set-lang")); });
+  });
+
+  var HERO_LINES = {
+    en: [
+      {c:"p", t:"$ ccdd diff contracts/support-agent contracts/support-agent-edit"},
+      {c:"bad", t:"DIFF: BLOCKED — context regressions detected:"},
+      {c:"bad", t:"  [X] critical slot 'policies': priority degraded 1 -> 3"},
+      {c:"bad", t:"  [X] slot 'environment' lost its signature"},
+      {c:"comment", t:"# the merge is frozen (exit 1) — a human must re-sign"},
+      {c:"p", t:"$ ccdd attest head policies --reviewer alice --key ~/.k"},
+      {c:"seal", t:"attested (Ed25519). DIFF: OK — no regressions."}
+    ],
+    es: [
+      {c:"p", t:"$ ccdd diff contracts/support-agent contracts/support-agent-edit"},
+      {c:"bad", t:"DIFF: BLOQUEADO — regresiones de contexto detectadas:"},
+      {c:"bad", t:"  [X] slot crítico 'policies': prioridad degradada 1 -> 3"},
+      {c:"bad", t:"  [X] slot 'environment' perdió la firma"},
+      {c:"comment", t:"# el merge se frena (exit 1) — un humano debe re-firmar"},
+      {c:"p", t:"$ ccdd attest head policies --reviewer alice --key ~/.k"},
+      {c:"seal", t:"atestado (Ed25519). DIFF: OK — sin regresiones."}
+    ],
+    pt: [
+      {c:"p", t:"$ ccdd diff contracts/support-agent contracts/support-agent-edit"},
+      {c:"bad", t:"DIFF: BLOQUEADO — regressões de contexto detectadas:"},
+      {c:"bad", t:"  [X] slot crítico 'policies': prioridade rebaixada 1 -> 3"},
+      {c:"bad", t:"  [X] slot 'environment' perdeu a assinatura"},
+      {c:"comment", t:"# o merge é congelado (exit 1) — um humano deve re-assinar"},
+      {c:"p", t:"$ ccdd attest head policies --reviewer alice --key ~/.k"},
+      {c:"seal", t:"atestado (Ed25519). DIFF: OK — sem regressões."}
+    ]
+  };
+  var ANN_LINES = {
+    en: [
+      {c:"p", t:"$ ccdd diff base/ head/"},
+      {c:"comment", t:"# R2: critical slot demoted"},
+      {c:"bad", t:"  [X] 'policies': priority 1 -> 3"},
+      {c:"comment", t:"# R9: guardrail removed"},
+      {c:"bad", t:"  [X] guardrail 'no-secrets' deleted"},
+      {c:"bad", t:"DIFF: BLOCKED (exit 1) — merge frozen"},
+      {c:"seal", t:"the context can't silently weaken."}
+    ],
+    es: [
+      {c:"p", t:"$ ccdd diff base/ head/"},
+      {c:"comment", t:"# R2: slot crítico degradado"},
+      {c:"bad", t:"  [X] 'policies': prioridad 1 -> 3"},
+      {c:"comment", t:"# R9: guardrail eliminado"},
+      {c:"bad", t:"  [X] guardrail 'no-secrets' borrado"},
+      {c:"bad", t:"DIFF: BLOQUEADO (exit 1) — merge frenado"},
+      {c:"seal", t:"el contexto no puede debilitarse en silencio."}
+    ],
+    pt: [
+      {c:"p", t:"$ ccdd diff base/ head/"},
+      {c:"comment", t:"# R2: slot crítico rebaixado"},
+      {c:"bad", t:"  [X] 'policies': prioridade 1 -> 3"},
+      {c:"comment", t:"# R9: guardrail removido"},
+      {c:"bad", t:"  [X] guardrail 'no-secrets' apagado"},
+      {c:"bad", t:"DIFF: BLOQUEADO (exit 1) — merge congelado"},
+      {c:"seal", t:"o contexto não pode enfraquecer em silêncio."}
+    ]
+  };
+
+  var heroTimer = null, annTimer = null;
+  function typeLines(el, lines, opts){
+    opts = opts || {};
+    if (heroTimer && opts.isHero) { clearTimeout(heroTimer); }
+    if (annTimer && !opts.isHero) { clearTimeout(annTimer); }
+    el.innerHTML = "";
+    if (REDUCED){
+      lines.forEach(function(ln){ var d=document.createElement("div"); d.className=ln.c; d.textContent=ln.t; el.appendChild(d); });
+      return;
+    }
+    var li = 0, ci = 0;
+    var cur = document.createElement("div");
+    cur.className = lines[0] ? lines[0].c : "";
+    el.appendChild(cur);
+    function step(){
+      if (li >= lines.length){
+        cur.classList.remove("term-cursor");
+        if (opts.loop){ var t=setTimeout(function(){ typeLines(el, lines, opts); }, 2400); if (opts.isHero) heroTimer=t; else annTimer=t; }
+        return;
+      }
+      var line = lines[li];
+      cur.className = line.c + " term-cursor";
+      if (ci < line.t.length){
+        cur.textContent = line.t.slice(0, ci+1); ci++;
+        var t = setTimeout(step, line.t[ci-1] === " " ? 6 : 13);
+        if (opts.isHero) heroTimer = t; else annTimer = t;
+      } else {
+        cur.classList.remove("term-cursor"); li++; ci = 0;
+        cur = document.createElement("div");
+        if (lines[li]) cur.className = lines[li].c;
+        el.appendChild(cur);
+        var t2 = setTimeout(step, 230);
+        if (opts.isHero) heroTimer = t2; else annTimer = t2;
+      }
+    }
+    step();
+  }
+  function buildTerminals(lang){
+    typeLines(document.getElementById("hero-term-body"), HERO_LINES[lang] || HERO_LINES.en, {loop:true, isHero:true});
+    typeLines(document.getElementById("ann-term-body"), ANN_LINES[lang] || ANN_LINES.en, {loop:true, isHero:false});
+  }
+
+  var levelsPlayed = false;
+  function playLevels(){
+    if (levelsPlayed) return; levelsPlayed = true;
+    var lvls = document.querySelectorAll("#levels-flow .lvl");
+    if (REDUCED){ lvls.forEach(function(l){ l.classList.add("on"); }); return; }
+    lvls.forEach(function(l, i){ setTimeout(function(){ l.classList.add("on"); }, i*450); });
+  }
+  var lf = document.getElementById("levels-flow");
+  if (lf && "IntersectionObserver" in window){
+    new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) playLevels(); }); }, {threshold:.35}).observe(lf);
+  } else if (lf){ playLevels(); }
+
+  var menuBtn = document.getElementById("menu-btn");
+  var navPanel = document.getElementById("mobile-nav-panel");
+  function closeMenu(){ if (!navPanel || navPanel.hidden) return; navPanel.hidden = true; if (menuBtn) menuBtn.setAttribute("aria-expanded","false"); }
+  function openMenu(){ navPanel.hidden = false; menuBtn.setAttribute("aria-expanded","true"); }
+  if (menuBtn && navPanel){
+    menuBtn.addEventListener("click", function(){ if (navPanel.hidden) openMenu(); else closeMenu(); });
+    navPanel.querySelectorAll("a").forEach(function(a){ a.addEventListener("click", closeMenu); });
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeMenu(); });
+    window.addEventListener("resize", function(){ if (window.innerWidth >= 960) closeMenu(); });
+  }
+
+  var saved = null;
+  try{ saved = localStorage.getItem("ccdd-lang"); }catch(e){}
+  applyLang(saved === "es" || saved === "pt" || saved === "en" ? saved : "en");
+})();
+</script>
+</body>
+</html>
