@@ -15,7 +15,10 @@ const SBX = "/tmp/pisbx";           // sandbox (usuario normal)
 const GATE = "/opt/pigate";          // gate (root 700)
 const SRC = `${SBX}/secret.mjs`;
 const OBJ = "Implementa 'export function secretCode(name)' en un modulo ES (NAMED EXPORT obligatorio). No conoces los valores de antemano: si no los sabes aun, devuelve 'export function secretCode(name){ return 0; }' para que el gate revele los esperados en el FEEDBACK (expected/actual); en el siguiente intento usa esos valores con un switch/objeto.";
-const KEY = JSON.parse(readFileSync("C:/Users/Administrador/.pi/agent/auth.json", "utf8")).ollama.key;
+// Credencial del modelo: preferentemente por env (OLLAMA_API_KEY); si no, se lee de un
+// auth.json cuya ruta también es configurable (default: la de la máquina original).
+const AUTH_JSON = process.env.PI_AUTH_JSON || "C:/Users/Administrador/.pi/agent/auth.json";
+const KEY = process.env.OLLAMA_API_KEY || JSON.parse(readFileSync(AUTH_JSON, "utf8")).ollama.key;
 const MAX = 3;
 
 const STUB = `export function secretCode(name){ return 0; }\n`;
@@ -62,7 +65,8 @@ function setup() {
 function teardown() { wsl(true, `rm -rf ${SBX} ${GATE} /tmp/_exec.mjs`); }
 
 // node vive en ~/.local/bin del usuario; root no lo tiene en PATH → ruta absoluta.
-const NODE = "/home/administrador/.local/bin/node";
+// Configurable por env para otras instalaciones de WSL/usuarios.
+const NODE = process.env.WSL_NODE_BIN || "/home/administrador/.local/bin/node";
 // ── gate: corre como ROOT (lee el test, importa la fuente del sandbox) ──
 function runGate() {
   const r = wsl(true, `${NODE} --test ${GATE}/secret.test.mjs 2>&1; echo "EXIT:$?"`);

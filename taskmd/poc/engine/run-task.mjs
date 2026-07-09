@@ -25,7 +25,7 @@ const CDP = (args.includes("--cdp") && cdpFlag) || process.env.CDP_URL || "http:
 if (!taskPath) { console.error("uso: run-task.mjs <TASK.md> [--lint|--dry] [--cdp url]"); process.exit(2); }
 
 // ── parse TASK front-matter ──
-const fmm = readFileSync(taskPath, "utf8").match(/^---\n([\s\S]*?)\n---/);
+const fmm = readFileSync(taskPath, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/);
 if (!fmm) { console.error("TASK.md sin front-matter YAML"); process.exit(2); }
 const meta = yaml.load(fmm[1]);
 
@@ -63,8 +63,8 @@ if (meta.dod) {
   const dodPath = rpath(dirname(taskPath), meta.dod);
   if (!existsSync(dodPath)) problems.push(`dod no existe: ${meta.dod}`);
   else {
-    try { dodSteps = yaml.load(readFileSync(dodPath, "utf8").match(/^---\n([\s\S]*?)\n---/)[1]).gates ?? []; }
-    catch (e) { problems.push(`dod ilegible: ${e.message}`); }
+    try { dodSteps = yaml.load(readFileSync(dodPath, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/)[1]).gates ?? []; }
+    catch (e) { problems.push(`dod ilegible o sin front-matter: ${e.message}`); }
   }
 }
 
@@ -163,7 +163,14 @@ const EXEC = { url: runUrl, dom: runDom, "dom-absent": runDomAbsent, "url-scheme
 const results = [];
 for (const r of all) {
   const exec = EXEC[r.gate.type];
-  const res = exec ? await exec(r.gate) : { expected: "—", observed: `gate desconocido: ${r.gate.type}`, pass: false };
+  // Un gate que LANZA (p.ej. CDP caído, fetch rechazado) es FAIL observable, no un
+  // crash del runner: el veredicto tiene que salir siempre, con la brecha registrada.
+  let res;
+  try {
+    res = exec ? await exec(r.gate) : { expected: "—", observed: `gate desconocido: ${r.gate.type}`, pass: false };
+  } catch (e) {
+    res = { expected: "—", observed: `ERROR ejecutando gate '${r.gate.type}': ${e.message}`, pass: false };
+  }
   results.push({ kind: r.kind, step: r.step, type: r.gate.type, ...res });
 }
 const acPass = results.filter((g) => g.kind === "AC").every((g) => g.pass);

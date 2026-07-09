@@ -117,14 +117,14 @@ El **veredicto siempre es del motor de gates**, nunca del ejecutor.
 
 | PoC | Demostró |
 |---|---|
-| **Browser login** (`TASK.login.md` + `gate-runner.mjs`) | Ejecutor barato (kimi) controla Chrome; gate por **CDP** verifica URL+DOM independiente; control negativo discrimina. |
+| **Browser login** (`TASK.login.md` + `gate-runner.mjs`) | Gate por **CDP** verifica URL+DOM independiente del ejecutor; control negativo discrimina. La corrida con kimi controlando Chrome se demostró en vivo durante el desarrollo; **el audit committeado (`poc-login-001`) es un `mock` determinista** del lazo (ver nota abajo). |
 | **Motor genérico** (`run-task.mjs`) | Lee cualquier `TASK.md`, matchea al catálogo, ejecuta gates; `--lint` previo; `technical_done = AC ∧ DoD`. |
 | **Lazo de orquestación** (`orchestrate.mjs`) | Un comando: lint → Chrome → delegar → gate → feedback/reintento → no-progreso → teardown. |
 | **Dev** (`TASK.dev.md`, gate `exit`) | El mismo sistema sin browser: AC=`node --test`, DoD=suite; el modelo barato implementa hasta verde. |
 | **Reintento real** (`TASK.dev-secret.md`) | Ejecutor ciego (`tool-restricted`) FAIL→FAIL→FAIL→PASS contra el feedback. |
 | **Sandbox / whack-a-mole** (`TASK.dev-sandbox.md`) | Copia aislada; reveló que `bash` escapa el FS compartido. |
 | **Container WSL** (`container-run.mjs`) | Confinamiento real con shell; Permission denied + loop converge. |
-| **Escalera** (`TASK.login-ladder.md`) | cheap no-progresa → sube a capable → PASS (audit con `rung`/`model`). |
+| **Escalera** (`TASK.login-ladder.md`) | cheap no-progresa → sube a capable → PASS. **Audit committeado = `mock` determinista** con modelos ficticios (`kimi-cheap`/`kimi-capable`): demuestra la mecánica de escalado, no una escalera con 2 modelos reales calibrados. |
 
 ### Correr
 
@@ -139,6 +139,20 @@ node container-run.mjs                         # runtime container en WSL2
 
 *(Los fixtures evolucionaron a lo largo de la sesión; algunos PoCs son ilustrativos y pueden
 requerir re-sembrar su `devrepo`/stub.)*
+
+### Sobre los audits committeados (honestidad)
+
+- **Reales** (`executor: "pi"`, corridas con el Pi coding agent): `poc-dev-001`, `poc-dev-002`,
+  `poc-dev-003` (el reintento ciego FAIL→FAIL→FAIL→PASS) y `poc-dev-sandbox`.
+- **Mock determinista** (`executor: "mock"`, sin modelo real — ejercitan la mecánica del lazo):
+  `poc-login-001` (browser) y `poc-ladder-001` (escalera). La corrida browser real con kimi+CDP
+  se demostró en vivo pero **no está committeada** como evidencia reproducible (requiere
+  Chrome/CDP/Ollama en la máquina de desarrollo). No leer estos dos como prueba de una corrida
+  con modelo real.
+- Los `devrepo/*.mjs` committeados son **stubs sin implementar** (con `TODO`); un audit `PASS`
+  histórico corresponde al momento en que el ejecutor los había implementado, no al estado
+  actual del stub. El gate `check-no-todo` ahora escanea los fuentes reales del directorio
+  (antes miraba `sum.mjs` hardcodeado), así que sobre los stubs actuales reporta el `TODO`.
 
 ---
 

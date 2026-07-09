@@ -15,14 +15,20 @@ const here = import.meta.dirname;
 const args = process.argv.slice(2);
 const taskPath = resolve(args.find((a) => !a.startsWith("--")));
 const executorMode = args[args.indexOf("--executor") + 1] || "pi";
-const meta = yaml.load(readFileSync(taskPath, "utf8").match(/^---\n([\s\S]*?)\n---/)[1]);
+// Front-matter tolerante a CRLF (checkout Windows) y sin desreferenciar null:
+// un TASK.md sin front-matter debe abortar con mensaje, no crashear con TypeError.
+const fmMatch = readFileSync(taskPath, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/);
+if (!fmMatch) { console.error(`✗ ${taskPath}: sin front-matter YAML (--- ... ---)`); process.exit(2); }
+const meta = yaml.load(fmMatch[1]);
 const objetivo = meta.objetivo;
 const maxRetries = args.includes("--max") ? Number(args[args.indexOf("--max") + 1]) : (meta.limits?.max_retries ?? 1);
 const startUrl = meta.browser?.start_url;
 
-const PI_CLI = "C:\\Users\\Administrador\\AppData\\Roaming\\npm\\node_modules\\@earendil-works\\pi-coding-agent\\dist\\cli.js";
-const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-const MCP = "C:\\Users\\Administrador\\.pi\\agent\\mcp.json";
+// Rutas del entorno (configurables; los defaults son los de la máquina de desarrollo
+// original — parametrizados vía env para que el PoC corra en otra máquina sin editar código).
+const PI_CLI = process.env.PI_CLI || "C:\\Users\\Administrador\\AppData\\Roaming\\npm\\node_modules\\@earendil-works\\pi-coding-agent\\dist\\cli.js";
+const CHROME = process.env.CHROME_BIN || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+const MCP = process.env.PI_MCP_JSON || "C:\\Users\\Administrador\\.pi\\agent\\mcp.json";
 const MCP_BAK = resolve(here, "_mcp.bak.json");
 const PROFILE = resolve(here, "_chrome_run");
 // 'powershell.exe' (no 'powershell') — spawnSync no añade .exe ni busca PATHEXT.
