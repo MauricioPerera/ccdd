@@ -4,6 +4,8 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![status: draft](https://img.shields.io/badge/spec-v0.3%20draft-orange.svg)](ccdd_spec_v0.3.md)
 
+🌐 **[Landing page](https://mauricioperera.github.io/ccdd/)** — un recorrido visual del método (toggle EN/ES/PT).
+
 > Una **metodología de desarrollo** para construir agentes de IA confiables, basada en
 > **contratos de contexto híbridos**. Como TDD pone el test primero y SDD pone la
 > especificación primero, **CCDD pone el contrato de contexto primero**.
