@@ -225,6 +225,25 @@ suite determinista, por ser no-determinista).
 
 ---
 
+## Familia
+
+CCDD comparte ADN —documento de dos capas (verificable por máquina + juzgable por humano) +
+validación determinista— con varios proyectos hermanos:
+
+- **[taskmd](https://github.com/MauricioPerera/taskmd)** — el hermano de **ejecución**: contratos
+  `TASK.md` (Acceptance Criteria + Definition of Done) cuya compleción la dictamina código contra
+  un sistema vivo (`technical_done = AC ∧ DoD`), independiente del modelo ejecutor.
+- **[ccdd-gate](https://github.com/MauricioPerera/ccdd-gate)** — el gate determinista de **código**:
+  complejidad ≤ budget firmado + property-tests congelados por hash, sin LLM en el veredicto.
+  Incluye `ccdd.py` de este repo como sustrato.
+- **[design.md](https://github.com/google-labs-code/design.md)** — identidad **visual** (Google Labs).
+- **[game-protocol](https://github.com/MauricioPerera/game-protocol)** — datos de **juego**.
+
+Complementarios, no competidores: ccdd gobierna el *contexto*, ccdd-gate verifica el *artefacto
+código* (estático), taskmd verifica la *compleción de la tarea* (dinámica, contra la realidad).
+
+---
+
 ## Procedencia
 
 Nació de un documento conceptual (`ccdd_workflow.md`) y creció **construyendo y atacando** su propia
